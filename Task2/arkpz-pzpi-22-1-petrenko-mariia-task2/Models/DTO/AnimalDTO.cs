@@ -1,6 +1,6 @@
-﻿namespace FarmKeeper.Models
+﻿namespace FarmKeeper.Models.DTO
 {
-    public class Animal
+    public class AnimalDTO
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

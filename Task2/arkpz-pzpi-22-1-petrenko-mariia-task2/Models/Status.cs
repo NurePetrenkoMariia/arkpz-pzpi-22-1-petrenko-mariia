@@ -1,4 +1,4 @@
-﻿namespace Models
+﻿namespace FarmKeeper.Models
 {
     public class Status
     {

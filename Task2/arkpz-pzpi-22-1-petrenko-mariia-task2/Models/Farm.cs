@@ -1,4 +1,4 @@
-﻿namespace Models
+﻿namespace FarmKeeper.Models
 {
     public class Farm
     {
@@ -8,6 +8,8 @@
         public string City { get; set; }
         public string Street { get; set; }
 
+        public Guid OwnerId { get; set; }
         public User Owner { get; set; }
+        public ICollection<User> Workers { get; set; }
     }
 }
