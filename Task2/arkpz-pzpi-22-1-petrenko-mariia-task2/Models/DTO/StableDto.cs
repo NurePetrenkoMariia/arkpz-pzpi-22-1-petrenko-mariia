@@ -1,6 +1,6 @@
-﻿namespace Models
+﻿namespace Models.DTO
 {
-    public class Stable
+    public class StableDto
     {
         public Guid Id { get; set; }
         public int MinFeedLevel { get; set; }
@@ -8,6 +8,5 @@
         public DateTime DateTimeOfUpdate { get; set; }
 
         public Guid FarmId { get; set; }
-        public Farm Farm { get; set; }
     }
 }

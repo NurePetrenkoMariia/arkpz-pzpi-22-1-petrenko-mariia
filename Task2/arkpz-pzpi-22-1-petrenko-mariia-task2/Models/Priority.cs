@@ -1,4 +1,4 @@
-﻿namespace FarmKeeper.Models
+﻿namespace Models
 {
     public class Priority
     {
