@@ -1,4 +1,4 @@
-Харківський університет радіоелектроніки
+﻿Харківський університет радіоелектроніки
 Факультет комп'ютерних наук
 Кафедра програмної інженерії
 
@@ -40,4 +40,1227 @@
 - Створити програмну реалізацію розробленого API та функцій роботи з БД.
 - Перевірити роботу створеного програмного коду серверної частини системи.
 3 ХІД РОБОТИ 
+     Для цієї лабораторної роботи були використані: ASP .NET Core WebApi, MS SQL Server, а також Entity Framework для роботи з базою даних.
+     В проекті було створено декілька основних папок: Models – для моделей бази даних, DTO – в якій знаходяться Data Transfer Objects, які отримуються та відправляється користувачем, Data - для налаштування взаємодії між серверною частиною та базою даних та управління моделями, Controllers - для роботи з HTTP-запитами та Repositories - для взаємодії з базою даних.
+     Спочатку була створена ER-діаграма бази даних системи, яка представлена на рисунку 1.
+
+Рисунок 1 - ER-діаграма бази даних
+     Наступним кроком було створення Use Case діаграми, що наведена на рисунку 2.
+
+Рисунок 2 – UML діаграма прецедентів для серверної частини
+     Після створення бази даних була отримана схема бази даних, яка представлена на рисунку 3 нижче.
+
+Рисунок 3 – Діаграма структури бази даних
+     Оскільки використовується Swagger, специфікацію API було створено автоматично, вона знаходиться в додатку А.
+     Фрагменти програмного коду, для демонстрації логіки взаємодії серверної частини з базою даних, наведені в додатку Б.1.
+     Фрагменти програмного коду, для демонстрації логіки взаємодії серверної частини з клієнтами, наведені в додатку Б.2.
      
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+ВИСНОВКИ
+     В ході виконання лабораторної роботи була розроблена базу даних для серверної частини  програмної системи та прикладний програмний інтерфейс. Також було створено відео-запис з демонстрацією роботи: https://youtu.be/q2AJbvQQzBM
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+ДОДАТОК А
+Специфікація API
+      1. {
+      2.   "openapi": "3.0.1",
+      3.   "info": {
+      4.     "title": "FarmKeeper",
+      5.     "version": "1.0"
+      6.   },
+      7.   "paths": {
+      8.     "/api/Animals": {
+      9.       "get": {
+      10.         "tags": [
+      11.           "Animals"
+      12.         ],
+      13.         "responses": {
+      14.           "200": {
+      15.             "description": "OK"
+      16.           }
+      17.         }
+      18.       },
+      19.       "post": {
+      20.         "tags": [
+      21.           "Animals"
+      22.         ],
+      23.         "requestBody": {
+      24.           "content": {
+      25.             "application/json": {
+      26.               "schema": {
+      27.                 "$ref": "#/components/schemas/AddAnimalRequestDto"
+      28.               }
+      29.             },
+      30.             "text/json": {
+      31.               "schema": {
+      32.                 "$ref": "#/components/schemas/AddAnimalRequestDto"
+      33.               }
+      34.             },
+      35.             "application/*+json": {
+      36.               "schema": {
+      37.                 "$ref": "#/components/schemas/AddAnimalRequestDto"
+      38.               }
+      39.             }
+      40.           }
+      41.         },
+      42.         "responses": {
+      43.           "200": {
+      44.             "description": "OK"
+      45.           }
+      46.         }
+      47.       }
+      48.     },
+      49.     "/api/Animals/{id}": {
+      50.       "get": {
+      51.         "tags": [
+      52.           "Animals"
+      53.         ],
+      54.         "parameters": [
+      55.           {
+      56.             "name": "id",
+      57.             "in": "path",
+      58.             "required": true,
+      59.             "schema": {
+      60.               "type": "string",
+      61.               "format": "uuid"
+      62.             }
+      63.           }
+      64.         ],
+      65.         "responses": {
+      66.           "200": {
+      67.             "description": "OK"
+      68.           }
+      69.         }
+      70.       },
+      71.       "put": {
+      72.         "tags": [
+      73.           "Animals"
+      74.         ],
+      75.         "parameters": [
+      76.           {
+      77.             "name": "id",
+      78.             "in": "path",
+      79.             "required": true,
+      80.             "schema": {
+      81.               "type": "string",
+      82.               "format": "uuid"
+      83.             }
+      84.           }
+      85.         ],
+      86.         "requestBody": {
+      87.           "content": {
+      88.             "application/json": {
+      89.               "schema": {
+      90.                 "$ref": "#/components/schemas/UpdateAnimalRequestDto"
+      91.               }
+      92.             },
+      93.             "text/json": {
+      94.               "schema": {
+      95.                 "$ref": "#/components/schemas/UpdateAnimalRequestDto"
+      96.               }
+      97.             },
+      98.             "application/*+json": {
+      99.               "schema": {
+      100.                 "$ref": "#/components/schemas/UpdateAnimalRequestDto"
+      101.               }
+      102.             }
+      103.           }
+      104.         },
+      105.         "responses": {
+      106.           "200": {
+      107.             "description": "OK"
+      108.           }
+      109.         }
+      110.       },
+      111.       "delete": {
+      112.         "tags": [
+      113.           "Animals"
+      114.         ],
+      115.         "parameters": [
+      116.           {
+      117.             "name": "id",
+      118.             "in": "path",
+      119.             "required": true,
+      120.             "schema": {
+      121.               "type": "string",
+      122.               "format": "uuid"
+      123.             }
+      124.           }
+      125.         ],
+      126.         "responses": {
+      127.           "200": {
+      128.             "description": "OK"
+      129.           }
+      130.         }
+      131.       }
+      132.     },
+      133.     "/api/Assignments": {
+      134.       "get": {
+      135.         "tags": [
+      136.           "Assignments"
+      137.         ],
+      138.         "responses": {
+      139.           "200": {
+      140.             "description": "OK"
+      141.           }
+      142.         }
+      143.       },
+      144.       "post": {
+      145.         "tags": [
+      146.           "Assignments"
+      147.         ],
+      148.         "requestBody": {
+      149.           "content": {
+      150.             "application/json": {
+      151.               "schema": {
+      152.                 "$ref": "#/components/schemas/AddAssignmentRequestDto"
+      153.               }
+      154.             },
+      155.             "text/json": {
+      156.               "schema": {
+      157.                 "$ref": "#/components/schemas/AddAssignmentRequestDto"
+      158.               }
+      159.             },
+      160.             "application/*+json": {
+      161.               "schema": {
+      162.                 "$ref": "#/components/schemas/AddAssignmentRequestDto"
+      163.               }
+      164.             }
+      165.           }
+      166.         },
+      167.         "responses": {
+      168.           "200": {
+      169.             "description": "OK"
+      170.           }
+      171.         }
+      172.       }
+      173.     },
+      174.     "/api/Assignments/{id}": {
+      175.       "get": {
+      176.         "tags": [
+      177.           "Assignments"
+      178.         ],
+      179.         "parameters": [
+      180.           {
+      181.             "name": "id",
+      182.             "in": "path",
+      183.             "required": true,
+      184.             "schema": {
+      185.               "type": "string",
+      186.               "format": "uuid"
+      187.             }
+      188.           }
+      189.         ],
+      190.         "responses": {
+      191.           "200": {
+      192.             "description": "OK"
+      193.           }
+      194.         }
+      195.       },
+      196.       "put": {
+      197.         "tags": [
+      198.           "Assignments"
+      199.         ],
+      200.         "parameters": [
+      201.           {
+      202.             "name": "id",
+      203.             "in": "path",
+      204.             "required": true,
+      205.             "schema": {
+      206.               "type": "string",
+      207.               "format": "uuid"
+      208.             }
+      209.           }
+      210.         ],
+      211.         "requestBody": {
+      212.           "content": {
+      213.             "application/json": {
+      214.               "schema": {
+      215.                 "$ref": "#/components/schemas/UpdateAssignmentRequestDto"
+      216.               }
+      217.             },
+      218.             "text/json": {
+      219.               "schema": {
+      220.                 "$ref": "#/components/schemas/UpdateAssignmentRequestDto"
+      221.               }
+      222.             },
+      223.             "application/*+json": {
+      224.               "schema": {
+      225.                 "$ref": "#/components/schemas/UpdateAssignmentRequestDto"
+      226.               }
+      227.             }
+      228.           }
+      229.         },
+      230.         "responses": {
+      231.           "200": {
+      232.             "description": "OK"
+      233.           }
+      234.         }
+      235.       },
+      236.       "delete": {
+      237.         "tags": [
+      238.           "Assignments"
+      239.         ],
+      240.         "parameters": [
+      241.           {
+      242.             "name": "id",
+      243.             "in": "path",
+      244.             "required": true,
+      245.             "schema": {
+      246.               "type": "string",
+      247.               "format": "uuid"
+      248.             }
+      249.           }
+      250.         ],
+      251.         "responses": {
+      252.           "200": {
+      253.             "description": "OK"
+      254.           }
+      255.         }
+      256.       }
+      257.     },
+      258.     "/api/Farms": {
+      259.       "get": {
+      260.         "tags": [
+      261.           "Farms"
+      262.         ],
+      263.         "responses": {
+      264.           "200": {
+      265.             "description": "OK"
+      266.           }
+      267.         }
+      268.       },
+      269.       "post": {
+      270.         "tags": [
+      271.           "Farms"
+      272.         ],
+      273.         "requestBody": {
+      274.           "content": {
+      275.             "application/json": {
+      276.               "schema": {
+      277.                 "$ref": "#/components/schemas/AddFarmRequestDto"
+      278.               }
+      279.             },
+      280.             "text/json": {
+      281.               "schema": {
+      282.                 "$ref": "#/components/schemas/AddFarmRequestDto"
+      283.               }
+      284.             },
+      285.             "application/*+json": {
+      286.               "schema": {
+      287.                 "$ref": "#/components/schemas/AddFarmRequestDto"
+      288.               }
+      289.             }
+      290.           }
+      291.         },
+      292.         "responses": {
+      293.           "200": {
+      294.             "description": "OK"
+      295.           }
+      296.         }
+      297.       }
+      298.     },
+      299.     "/api/Farms/{id}": {
+      300.       "get": {
+      301.         "tags": [
+      302.           "Farms"
+      303.         ],
+      304.         "parameters": [
+      305.           {
+      306.             "name": "id",
+      307.             "in": "path",
+      308.             "required": true,
+      309.             "schema": {
+      310.               "type": "string",
+      311.               "format": "uuid"
+      312.             }
+      313.           }
+      314.         ],
+      315.         "responses": {
+      316.           "200": {
+      317.             "description": "OK"
+      318.           }
+      319.         }
+      320.       },
+      321.       "put": {
+      322.         "tags": [
+      323.           "Farms"
+      324.         ],
+      325.         "parameters": [
+      326.           {
+      327.             "name": "id",
+      328.             "in": "path",
+      329.             "required": true,
+      330.             "schema": {
+      331.               "type": "string",
+      332.               "format": "uuid"
+      333.             }
+      334.           }
+      335.         ],
+      336.         "requestBody": {
+      337.           "content": {
+      338.             "application/json": {
+      339.               "schema": {
+      340.                 "$ref": "#/components/schemas/UpdateFarmRequestDto"
+      341.               }
+      342.             },
+      343.             "text/json": {
+      344.               "schema": {
+      345.                 "$ref": "#/components/schemas/UpdateFarmRequestDto"
+      346.               }
+      347.             },
+      348.             "application/*+json": {
+      349.               "schema": {
+      350.                 "$ref": "#/components/schemas/UpdateFarmRequestDto"
+      351.               }
+      352.             }
+      353.           }
+      354.         },
+      355.         "responses": {
+      356.           "200": {
+      357.             "description": "OK"
+      358.           }
+      359.         }
+      360.       },
+      361.       "delete": {
+      362.         "tags": [
+      363.           "Farms"
+      364.         ],
+      365.         "parameters": [
+      366.           {
+      367.             "name": "id",
+      368.             "in": "path",
+      369.             "required": true,
+      370.             "schema": {
+      371.               "type": "string",
+      372.               "format": "uuid"
+      373.             }
+      374.           }
+      375.         ],
+      376.         "responses": {
+      377.           "200": {
+      378.             "description": "OK"
+      379.           }
+      380.         }
+      381.       }
+      382.     },
+      383.     "/api/Notifications": {
+      384.       "get": {
+      385.         "tags": [
+      386.           "Notifications"
+      387.         ],
+      388.         "responses": {
+      389.           "200": {
+      390.             "description": "OK"
+      391.           }
+      392.         }
+      393.       },
+      394.       "post": {
+      395.         "tags": [
+      396.           "Notifications"
+      397.         ],
+      398.         "requestBody": {
+      399.           "content": {
+      400.             "application/json": {
+      401.               "schema": {
+      402.                 "$ref": "#/components/schemas/AddNotificationRequestDto"
+      403.               }
+      404.             },
+      405.             "text/json": {
+      406.               "schema": {
+      407.                 "$ref": "#/components/schemas/AddNotificationRequestDto"
+      408.               }
+      409.             },
+      410.             "application/*+json": {
+      411.               "schema": {
+      412.                 "$ref": "#/components/schemas/AddNotificationRequestDto"
+      413.               }
+      414.             }
+      415.           }
+      416.         },
+      417.         "responses": {
+      418.           "200": {
+      419.             "description": "OK"
+      420.           }
+      421.         }
+      422.       }
+      423.     },
+      424.     "/api/Notifications/{id}": {
+      425.       "get": {
+      426.         "tags": [
+      427.           "Notifications"
+      428.         ],
+      429.         "parameters": [
+      430.           {
+      431.             "name": "id",
+      432.             "in": "path",
+      433.             "required": true,
+      434.             "schema": {
+      435.               "type": "string",
+      436.               "format": "uuid"
+      437.             }
+      438.           }
+      439.         ],
+      440.         "responses": {
+      441.           "200": {
+      442.             "description": "OK"
+      443.           }
+      444.         }
+      445.       },
+      446.       "put": {
+      447.         "tags": [
+      448.           "Notifications"
+      449.         ],
+      450.         "parameters": [
+      451.           {
+      452.             "name": "id",
+      453.             "in": "path",
+      454.             "required": true,
+      455.             "schema": {
+      456.               "type": "string",
+      457.               "format": "uuid"
+      458.             }
+      459.           }
+      460.         ],
+      461.         "requestBody": {
+      462.           "content": {
+      463.             "application/json": {
+      464.               "schema": {
+      465.                 "$ref": "#/components/schemas/UpdateNotificationRequestDto"
+      466.               }
+      467.             },
+      468.             "text/json": {
+      469.               "schema": {
+      470.                 "$ref": "#/components/schemas/UpdateNotificationRequestDto"
+      471.               }
+      472.             },
+      473.             "application/*+json": {
+      474.               "schema": {
+      475.                 "$ref": "#/components/schemas/UpdateNotificationRequestDto"
+      476.               }
+      477.             }
+      478.           }
+      479.         },
+      480.         "responses": {
+      481.           "200": {
+      482.             "description": "OK"
+      483.           }
+      484.         }
+      485.       },
+      486.       "delete": {
+      487.         "tags": [
+      488.           "Notifications"
+      489.         ],
+      490.         "parameters": [
+      491.           {
+      492.             "name": "id",
+      493.             "in": "path",
+      494.             "required": true,
+      495.             "schema": {
+      496.               "type": "string",
+      497.               "format": "uuid"
+      498.             }
+      499.           }
+      500.         ],
+      501.         "responses": {
+      502.           "200": {
+      503.             "description": "OK"
+      504.           }
+      505.         }
+      506.       }
+      507.     },
+      508.     "/api/Stables": {
+      509.       "get": {
+      510.         "tags": [
+      511.           "Stables"
+      512.         ],
+      513.         "responses": {
+      514.           "200": {
+      515.             "description": "OK"
+      516.           }
+      517.         }
+      518.       },
+      519.       "post": {
+      520.         "tags": [
+      521.           "Stables"
+      522.         ],
+      523.         "requestBody": {
+      524.           "content": {
+      525.             "application/json": {
+      526.               "schema": {
+      527.                 "$ref": "#/components/schemas/AddStableRequestDto"
+      528.               }
+      529.             },
+      530.             "text/json": {
+      531.               "schema": {
+      532.                 "$ref": "#/components/schemas/AddStableRequestDto"
+      533.               }
+      534.             },
+      535.             "application/*+json": {
+      536.               "schema": {
+      537.                 "$ref": "#/components/schemas/AddStableRequestDto"
+      538.               }
+      539.             }
+      540.           }
+      541.         },
+      542.         "responses": {
+      543.           "200": {
+      544.             "description": "OK"
+      545.           }
+      546.         }
+      547.       }
+      548.     },
+      549.     "/api/Stables/{id}": {
+      550.       "get": {
+      551.         "tags": [
+      552.           "Stables"
+      553.         ],
+      554.         "parameters": [
+      555.           {
+      556.             "name": "id",
+      557.             "in": "path",
+      558.             "required": true,
+      559.             "schema": {
+      560.               "type": "string",
+      561.               "format": "uuid"
+      562.             }
+      563.           }
+      564.         ],
+      565.         "responses": {
+      566.           "200": {
+      567.             "description": "OK"
+      568.           }
+      569.         }
+      570.       },
+      571.       "put": {
+      572.         "tags": [
+      573.           "Stables"
+      574.         ],
+      575.         "parameters": [
+      576.           {
+      577.             "name": "id",
+      578.             "in": "path",
+      579.             "required": true,
+      580.             "schema": {
+      581.               "type": "string",
+      582.               "format": "uuid"
+      583.             }
+      584.           }
+      585.         ],
+      586.         "requestBody": {
+      587.           "content": {
+      588.             "application/json": {
+      589.               "schema": {
+      590.                 "$ref": "#/components/schemas/UpdateStableRequestDto"
+      591.               }
+      592.             },
+      593.             "text/json": {
+      594.               "schema": {
+      595.                 "$ref": "#/components/schemas/UpdateStableRequestDto"
+      596.               }
+      597.             },
+      598.             "application/*+json": {
+      599.               "schema": {
+      600.                 "$ref": "#/components/schemas/UpdateStableRequestDto"
+      601.               }
+      602.             }
+      603.           }
+      604.         },
+      605.         "responses": {
+      606.           "200": {
+      607.             "description": "OK"
+      608.           }
+      609.         }
+      610.       },
+      611.       "delete": {
+      612.         "tags": [
+      613.           "Stables"
+      614.         ],
+      615.         "parameters": [
+      616.           {
+      617.             "name": "id",
+      618.             "in": "path",
+      619.             "required": true,
+      620.             "schema": {
+      621.               "type": "string",
+      622.               "format": "uuid"
+      623.             }
+      624.           }
+      625.         ],
+      626.         "responses": {
+      627.           "200": {
+      628.             "description": "OK"
+      629.           }
+      630.         }
+      631.       }
+      632.     },
+      633.     "/api/Users": {
+      634.       "get": {
+      635.         "tags": [
+      636.           "Users"
+      637.         ],
+      638.         "responses": {
+      639.           "200": {
+      640.             "description": "OK"
+      641.           }
+      642.         }
+      643.       },
+      644.       "post": {
+      645.         "tags": [
+      646.           "Users"
+      647.         ],
+      648.         "requestBody": {
+      649.           "content": {
+      650.             "application/json": {
+      651.               "schema": {
+      652.                 "$ref": "#/components/schemas/AddUserRequestDto"
+      653.               }
+      654.             },
+      655.             "text/json": {
+      656.               "schema": {
+      657.                 "$ref": "#/components/schemas/AddUserRequestDto"
+      658.               }
+      659.             },
+      660.             "application/*+json": {
+      661.               "schema": {
+      662.                 "$ref": "#/components/schemas/AddUserRequestDto"
+      663.               }
+      664.             }
+      665.           }
+      666.         },
+      667.         "responses": {
+      668.           "200": {
+      669.             "description": "OK"
+      670.           }
+      671.         }
+      672.       }
+      673.     },
+      674.     "/api/Users/{id}": {
+      675.       "get": {
+      676.         "tags": [
+      677.           "Users"
+      678.         ],
+      679.         "parameters": [
+      680.           {
+      681.             "name": "id",
+      682.             "in": "path",
+      683.             "required": true,
+      684.             "schema": {
+      685.               "type": "string",
+      686.               "format": "uuid"
+      687.             }
+      688.           }
+      689.         ],
+      690.         "responses": {
+      691.           "200": {
+      692.             "description": "OK"
+      693.           }
+      694.         }
+      695.       },
+      696.       "put": {
+      697.         "tags": [
+      698.           "Users"
+      699.         ],
+      700.         "parameters": [
+      701.           {
+      702.             "name": "id",
+      703.             "in": "path",
+      704.             "required": true,
+      705.             "schema": {
+      706.               "type": "string",
+      707.               "format": "uuid"
+      708.             }
+      709.           }
+      710.         ],
+      711.         "requestBody": {
+      712.           "content": {
+      713.             "application/json": {
+      714.               "schema": {
+      715.                 "$ref": "#/components/schemas/UpdateUserRequestDto"
+      716.               }
+      717.             },
+      718.             "text/json": {
+      719.               "schema": {
+      720.                 "$ref": "#/components/schemas/UpdateUserRequestDto"
+      721.               }
+      722.             },
+      723.             "application/*+json": {
+      724.               "schema": {
+      725.                 "$ref": "#/components/schemas/UpdateUserRequestDto"
+      726.               }
+      727.             }
+      728.           }
+      729.         },
+      730.         "responses": {
+      731.           "200": {
+      732.             "description": "OK"
+      733.           }
+      734.         }
+      735.       },
+      736.       "delete": {
+      737.         "tags": [
+      738.           "Users"
+      739.         ],
+      740.         "parameters": [
+      741.           {
+      742.             "name": "id",
+      743.             "in": "path",
+      744.             "required": true,
+      745.             "schema": {
+      746.               "type": "string",
+      747.               "format": "uuid"
+      748.             }
+      749.           }
+      750.         ],
+      751.         "responses": {
+      752.           "200": {
+      753.             "description": "OK"
+      754.           }
+      755.         }
+      756.       }
+      757.     }
+      758.   },
+      759.   "components": {
+      760.     "schemas": {
+      761.       "AddAnimalRequestDto": {
+      762.         "type": "object",
+      763.         "properties": {
+      764.           "name": {
+      765.             "type": "string",
+      766.             "nullable": true
+      767.           },
+      768.           "species": {
+      769.             "type": "string",
+      770.             "nullable": true
+      771.           },
+      772.           "breed": {
+      773.             "type": "string",
+      774.             "nullable": true
+      775.           },
+      776.           "dateOfBirth": {
+      777.             "type": "string",
+      778.             "format": "date"
+      779.           },
+      780.           "sex": {
+      781.             "$ref": "#/components/schemas/Sex"
+      782.           },
+      783.           "stableId": {
+      784.             "type": "string",
+      785.             "format": "uuid"
+      786.           }
+      787.         },
+      788.         "additionalProperties": false
+      789.       },
+      790.       "AddAssignmentRequestDto": {
+      791.         "type": "object",
+      792.         "properties": {
+      793.           "name": {
+      794.             "type": "string",
+      795.             "nullable": true
+      796.           },
+      797.           "description": {
+      798.             "type": "string",
+      799.             "nullable": true
+      800.           },
+      801.           "numberOfParticipants": {
+      802.             "maximum": 2147483647,
+      803.             "minimum": 0,
+      804.             "type": "integer",
+      805.             "format": "int32"
+      806.           },
+      807.           "statusId": {
+      808.             "type": "string",
+      809.             "format": "uuid"
+      810.           },
+      811.           "priorityId": {
+      812.             "type": "string",
+      813.             "format": "uuid"
+      814.           }
+      815.         },
+      816.         "additionalProperties": false
+      817.       },
+      818.       "AddFarmRequestDto": {
+      819.         "type": "object",
+      820.         "properties": {
+      821.           "name": {
+      822.             "type": "string",
+      823.             "nullable": true
+      824.           },
+      825.           "country": {
+      826.             "type": "string",
+      827.             "nullable": true
+      828.           },
+      829.           "city": {
+      830.             "type": "string",
+      831.             "nullable": true
+      832.           },
+      833.           "street": {
+      834.             "type": "string",
+      835.             "nullable": true
+      836.           },
+      837.           "ownerId": {
+      838.             "type": "string",
+      839.             "format": "uuid"
+      840.           }
+      841.         },
+      842.         "additionalProperties": false
+      843.       },
+      844.       "AddNotificationRequestDto": {
+      845.         "type": "object",
+      846.         "properties": {
+      847.           "title": {
+      848.             "type": "string",
+      849.             "nullable": true
+      850.           },
+      851.           "text": {
+      852.             "type": "string",
+      853.             "nullable": true
+      854.           },
+      855.           "dateTimeCreated": {
+      856.             "type": "string",
+      857.             "format": "date-time"
+      858.           },
+      859.           "userId": {
+      860.             "type": "string",
+      861.             "format": "uuid"
+      862.           }
+      863.         },
+      864.         "additionalProperties": false
+      865.       },
+      866.       "AddStableRequestDto": {
+      867.         "type": "object",
+      868.         "properties": {
+      869.           "minFeedLevel": {
+      870.             "maximum": 2147483647,
+      871.             "minimum": 0,
+      872.             "type": "integer",
+      873.             "format": "int32"
+      874.           },
+      875.           "currentFeedLevel": {
+      876.             "maximum": 2147483647,
+      877.             "minimum": 0,
+      878.             "type": "integer",
+      879.             "format": "int32"
+      880.           },
+      881.           "dateTimeOfUpdate": {
+      882.             "type": "string",
+      883.             "format": "date-time"
+      884.           },
+      885.           "farmId": {
+      886.             "type": "string",
+      887.             "format": "uuid"
+      888.           }
+      889.         },
+      890.         "additionalProperties": false
+      891.       },
+      892.       "AddUserRequestDto": {
+      893.         "type": "object",
+      894.         "properties": {
+      895.           "firstName": {
+      896.             "type": "string",
+      897.             "nullable": true
+      898.           },
+      899.           "lastName": {
+      900.             "type": "string",
+      901.             "nullable": true
+      902.           },
+      903.           "dateOfBirth": {
+      904.             "type": "string",
+      905.             "format": "date"
+      906.           },
+      907.           "phoneNumber": {
+      908.             "type": "string",
+      909.             "nullable": true
+      910.           },
+      911.           "email": {
+      912.             "type": "string",
+      913.             "nullable": true
+      914.           },
+      915.           "passwordHash": {
+      916.             "type": "string",
+      917.             "nullable": true
+      918.           },
+      919.           "farmId": {
+      920.             "type": "string",
+      921.             "format": "uuid",
+      922.             "nullable": true
+      923.           },
+      924.           "roleId": {
+      925.             "type": "string",
+      926.             "format": "uuid"
+      927.           }
+      928.         },
+      929.         "additionalProperties": false
+      930.       },
+      931.       "Sex": {
+      932.         "enum": [
+      933.           0,
+      934.           1
+      935.         ],
+      936.         "type": "integer",
+      937.         "format": "int32"
+      938.       },
+      939.       "UpdateAnimalRequestDto": {
+      940.         "type": "object",
+      941.         "properties": {
+      942.           "name": {
+      943.             "type": "string",
+      944.             "nullable": true
+      945.           },
+      946.           "species": {
+      947.             "type": "string",
+      948.             "nullable": true
+      949.           },
+      950.           "breed": {
+      951.             "type": "string",
+      952.             "nullable": true
+      953.           },
+      954.           "dateOfBirth": {
+      955.             "type": "string",
+      956.             "format": "date"
+      957.           },
+      958.           "sex": {
+      959.             "$ref": "#/components/schemas/Sex"
+      960.           },
+      961.           "stableId": {
+      962.             "type": "string",
+      963.             "format": "uuid"
+      964.           }
+      965.         },
+      966.         "additionalProperties": false
+      967.       },
+      968.       "UpdateAssignmentRequestDto": {
+      969.         "type": "object",
+      970.         "properties": {
+      971.           "name": {
+      972.             "type": "string",
+      973.             "nullable": true
+      974.           },
+      975.           "description": {
+      976.             "type": "string",
+      977.             "nullable": true
+      978.           },
+      979.           "numberOfParticipants": {
+      980.             "maximum": 2147483647,
+      981.             "minimum": 0,
+      982.             "type": "integer",
+      983.             "format": "int32"
+      984.           },
+      985.           "statusId": {
+      986.             "type": "string",
+      987.             "format": "uuid"
+      988.           },
+      989.           "priorityId": {
+      990.             "type": "string",
+      991.             "format": "uuid"
+      992.           }
+      993.         },
+      994.         "additionalProperties": false
+      995.       },
+      996.       "UpdateFarmRequestDto": {
+      997.         "type": "object",
+      998.         "properties": {
+      999.           "name": {
+      1000.             "type": "string",
+      1001.             "nullable": true
+      1002.           },
+      1003.           "country": {
+      1004.             "type": "string",
+      1005.             "nullable": true
+      1006.           },
+      1007.           "city": {
+      1008.             "type": "string",
+      1009.             "nullable": true
+      1010.           },
+      1011.           "street": {
+      1012.             "type": "string",
+      1013.             "nullable": true
+      1014.           },
+      1015.           "ownerId": {
+      1016.             "type": "string",
+      1017.             "format": "uuid"
+      1018.           }
+      1019.         },
+      1020.         "additionalProperties": false
+      1021.       },
+      1022.       "UpdateNotificationRequestDto": {
+      1023.         "type": "object",
+      1024.         "properties": {
+      1025.           "title": {
+      1026.             "type": "string",
+      1027.             "nullable": true
+      1028.           },
+      1029.           "text": {
+      1030.             "type": "string",
+      1031.             "nullable": true
+      1032.           },
+      1033.           "dateTimeCreated": {
+      1034.             "type": "string",
+      1035.             "format": "date-time"
+      1036.           },
+      1037.           "userId": {
+      1038.             "type": "string",
+      1039.             "format": "uuid"
+      1040.           }
+      1041.         },
+      1042.         "additionalProperties": false
+      1043.       },
+      1044.       "UpdateStableRequestDto": {
+      1045.         "type": "object",
+      1046.         "properties": {
+      1047.           "minFeedLevel": {
+      1048.             "maximum": 2147483647,
+      1049.             "minimum": 0,
+      1050.             "type": "integer",
+      1051.             "format": "int32"
+      1052.           },
+      1053.           "currentFeedLevel": {
+      1054.             "maximum": 2147483647,
+      1055.             "minimum": 0,
+      1056.             "type": "integer",
+      1057.             "format": "int32"
+      1058.           },
+      1059.           "dateTimeOfUpdate": {
+      1060.             "type": "string",
+      1061.             "format": "date-time"
+      1062.           },
+      1063.           "farmId": {
+      1064.             "type": "string",
+      1065.             "format": "uuid"
+      1066.           }
+      1067.         },
+      1068.         "additionalProperties": false
+      1069.       },
+      1070.       "UpdateUserRequestDto": {
+      1071.         "type": "object",
+      1072.         "properties": {
+      1073.           "firstName": {
+      1074.             "type": "string",
+      1075.             "nullable": true
+      1076.           },
+      1077.           "lastName": {
+      1078.             "type": "string",
+      1079.             "nullable": true
+      1080.           },
+      1081.           "dateOfBirth": {
+      1082.             "type": "string",
+      1083.             "format": "date"
+      1084.           },
+      1085.           "phoneNumber": {
+      1086.             "type": "string",
+      1087.             "nullable": true
+      1088.           },
+      1089.           "email": {
+      1090.             "type": "string",
+      1091.             "nullable": true
+      1092.           },
+      1093.           "passwordHash": {
+      1094.             "type": "string",
+      1095.             "nullable": true
+      1096.           },
+      1097.           "farmId": {
+      1098.             "type": "string",
+      1099.             "format": "uuid",
+      1100.             "nullable": true
+      1101.           },
+      1102.           "roleId": {
+      1103.             "type": "string",
+      1104.             "format": "uuid"
+      1105.           }
+      1106.         },
+      1107.         "additionalProperties": false
+      1108.       }
+      1109.     }
+      1110.   }
+      1111. }
+ДОДАТОК Б
+Фрагменти програмного коду
+     Б.1 Фрагменти програмного коду для демонстрації взаємодії серверної частини з БД
+      1. public async Task<Farm?> DeleteAsync(Guid id)
+      2. {
+      3.     var existingFarm = await dbContext.Farms.FirstOrDefaultAsync(x => x.Id == id);
+      4. 
+      5.     if (existingFarm == null)
+      6.     {
+      7.         return null;
+      8.     }
+      9. 
+      10.     dbContext.Farms.Remove(existingFarm);
+      11.     await dbContext.SaveChangesAsync();
+      12.     return existingFarm;
+      13. }
+      14. public async Task<Farm?> UpdateAsync(Guid id, Farm farm)
+      15. {
+      16.     var existingFarm = await dbContext.Farms.FirstOrDefaultAsync(x => x.Id == id);
+      17. 
+      18.     if (existingFarm == null)
+      19.     {
+      20.         return null;
+      21.     }
+      22. 
+      23.     existingFarm.Name = farm.Name;
+      24.     existingFarm.Country = farm.Country;
+      25.     existingFarm.City = farm.City;
+      26.     existingFarm.Street = farm.Street;
+      27.     existingFarm.OwnerId = farm.OwnerId;
+      28. 
+      29.     await dbContext.SaveChangesAsync();
+      30.     return existingFarm;
+      31. }
+      
+     Б.2 Фрагменти програмного коду для демонстрації взаємодії серверної частини з клієнтами
+      1. [HttpDelete]
+      2. [Route("{id:Guid}")]
+      3. 
+      4. public async Task<IActionResult> Delete([FromRoute] Guid id)
+      5. {
+      6.     var farmDomain = await farmRepository.DeleteAsync(id);
+      7.     if (farmDomain == null)
+      8.     {
+      9.         return NotFound();
+      10.     }
+      11.     var farmDto = new FarmDto
+      12.     {
+      13.         Id = farmDomain.Id,
+      14.         Name = farmDomain.Name,
+      15.         Country = farmDomain.Country,
+      16.         City = farmDomain.City,
+      17.         Street = farmDomain.Street,
+      18.         OwnerId = farmDomain.OwnerId,
+      19.     };
+      20. 
+      21.     return Ok(farmDto);
+      22. }
+
