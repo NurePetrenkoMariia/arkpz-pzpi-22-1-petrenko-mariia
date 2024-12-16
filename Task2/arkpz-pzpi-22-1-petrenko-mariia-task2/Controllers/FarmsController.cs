@@ -1,40 +1,30 @@
-﻿using Models;
-using Models.DTO;
-using Repositories;
+﻿using FarmKeeper.Mapper;
+using FarmKeeper.Models;
+using FarmKeeper.Models.DTO;
+using FarmKeeper.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Controllers
+namespace FarmKeeper.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class FarmsController : ControllerBase
     {
         private readonly IFarmRepository farmRepository;
-        public FarmsController(IFarmRepository farmRepository)
+        private readonly IUserRepository userRepository;
+        public FarmsController(IFarmRepository farmRepository, IUserRepository userRepository)
         {
             this.farmRepository = farmRepository;
+            this.userRepository = userRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var farmsDomain = await farmRepository.GetAllAsync();
-            var farmsDto = new List<FarmDto>();
-            foreach (var farm in farmsDomain)
-            {
-                farmsDto.Add(new FarmDto()
-                {
-                    Id = farm.Id,
-                    Name = farm.Name,
-                    Country = farm.Country,
-                    City = farm.City,
-                    Street = farm.Street,
-                    OwnerId = farm.OwnerId,
-
-                });
-            }
-            return Ok(farmsDto);
+            var farmDomain = await farmRepository.GetAllAsync();
+            var farmDto = farmDomain.Select(f => f.ToFarmDto());
+            return Ok(farmDto);
         }
 
         [HttpGet]
@@ -46,71 +36,44 @@ namespace Controllers
             {
                 return NotFound();
             }
-            var farmDto = new FarmDto
-            {
-                Id = farmDomain.Id,
-                Name = farmDomain.Name,
-                Country = farmDomain.Country,
-                City = farmDomain.City,
-                Street = farmDomain.Street,
-                OwnerId = farmDomain.OwnerId,
-
-            };
-            return Ok(farmDto);
+            
+            return Ok(farmDomain.ToFarmDto());
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] AddFarmRequestDto addFarmRequestDto)
+        [HttpPost("{ownerId}")]
+        public async Task<IActionResult> Create([FromRoute] Guid ownerId, [FromBody] AddFarmRequestDto addFarmRequestDto)
         {
-            var farmDomain = new Farm
+
+            var user = await userRepository.GetByIdAsync(ownerId);
+            if (user == null)
             {
-                Name = addFarmRequestDto.Name,
-                Country = addFarmRequestDto.Country,
-                City = addFarmRequestDto.City,
-                Street = addFarmRequestDto.Street,
-                OwnerId = addFarmRequestDto.OwnerId,
-            };
+                return NotFound("User not found.");
+            }
+            var farmDomain = addFarmRequestDto.ToFarmFromCreate(ownerId);
 
             farmDomain = await farmRepository.CreateAsync(farmDomain);
-            var farmDto = new Farm
-            {
-                Name = farmDomain.Name,
-                Country = farmDomain.Country,
-                City = farmDomain.City,
-                Street = farmDomain.Street,
-                OwnerId = farmDomain.OwnerId,
-            };
 
-            return Ok();
+            var farmDto = farmDomain.ToFarmDto();
+            return CreatedAtAction(nameof(GetById), new { id = farmDomain.Id }, farmDto);
         }
 
         [HttpPut]
         [Route("{id:Guid}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateFarmRequestDto updateFarmRequestDto)
         {
-            var farmDomain = new Farm
+            var user = await userRepository.GetByIdAsync(updateFarmRequestDto.OwnerId);
+            if (user == null)
             {
-                Name = updateFarmRequestDto.Name,
-                Country = updateFarmRequestDto.Country,
-                City = updateFarmRequestDto.City,
-                Street = updateFarmRequestDto.Street,
-                OwnerId = updateFarmRequestDto.OwnerId,
-            };
+                return NotFound($"User not found.");
+            }
 
-            farmDomain = await farmRepository.UpdateAsync(id, farmDomain);
+            var farmDomain = await farmRepository.UpdateAsync(id, updateFarmRequestDto.ToFarmFromUpdate());
             if (farmDomain == null)
             {
-                return NotFound();
+                return NotFound("Farm not found");
             }
-            var farmDto = new Farm
-            {
-                Name = farmDomain.Name,
-                Country = farmDomain.Country,
-                City = farmDomain.City,
-                Street = farmDomain.Street,
-                OwnerId = farmDomain.OwnerId,
-            };
-            return Ok(farmDto);
+            
+            return Ok(farmDomain.ToFarmDto());
         }
 
         [HttpDelete]
@@ -121,19 +84,10 @@ namespace Controllers
             var farmDomain = await farmRepository.DeleteAsync(id);
             if (farmDomain == null)
             {
-                return NotFound();
+                return NotFound("Farm does not exist");
             }
-            var farmDto = new FarmDto
-            {
-                Id = farmDomain.Id,
-                Name = farmDomain.Name,
-                Country = farmDomain.Country,
-                City = farmDomain.City,
-                Street = farmDomain.Street,
-                OwnerId = farmDomain.OwnerId,
-            };
 
-            return Ok(farmDto);
+            return Ok(farmDomain.ToFarmDto());
         }
     }
 }

@@ -1,10 +1,11 @@
-﻿using Models;
-using Models.DTO;
-using Repositories;
+﻿using FarmKeeper.Mapper;
+using FarmKeeper.Models;
+using FarmKeeper.Models.DTO;
+using FarmKeeper.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Controllers
+namespace FarmKeeper.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -21,24 +22,10 @@ namespace Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var animalsDomain = await animalRepository.GetAllAsync();
-            var animalsDto = new List<AnimalDto>();
-            foreach (var animal in animalsDomain)
-            {
-                animalsDto.Add(new AnimalDto()
-                {
-                    Id = animal.Id,
-                    Name = animal.Name,
-                    Species = animal.Species,
-                    Breed = animal.Breed,
-                    DateOfBirth = animal.DateOfBirth,
-                    Sex = animal.Sex,
-                    FarmId = animal.FarmId,
-                    StableId = animal.StableId,
-
-                });
-            }
-            return Ok(animalsDto);
+            var animalDomain = await animalRepository.GetAllAsync();
+            var animalDto = animalDomain.Select(a => a.ToAnimalDto());
+        
+            return Ok(animalDto);
         }
 
         [HttpGet]
@@ -50,54 +37,26 @@ namespace Controllers
             {
                 return NotFound();
             }
-            var animalDto = new AnimalDto
-            {
-                Id = animalDomain.Id,
-                Name = animalDomain.Name,
-                Species = animalDomain.Species,
-                Breed = animalDomain.Breed,
-                DateOfBirth = animalDomain.DateOfBirth,
-                Sex = animalDomain.Sex,
-                FarmId = animalDomain.FarmId,
-                StableId = animalDomain.StableId,
-
-            };
-            return Ok(animalDto);
+           
+            return Ok(animalDomain.ToAnimalDto());
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] AddAnimalRequestDto addAnimalRequestDto)
+        [HttpPost("{stableId}")]
+        public async Task<IActionResult> Create([FromRoute] Guid stableId, [FromBody] AddAnimalRequestDto addAnimalRequestDto)
         {
-            var stable = await stableRepository.GetByIdAsync(addAnimalRequestDto.StableId);
+            var stable = await stableRepository.GetByIdAsync(stableId);
             if (stable == null)
             {
-                return NotFound($"Stable with ID {addAnimalRequestDto.StableId} not found.");
+                return NotFound("Stable not found.");
             }
 
-            var animalDomain = new Animal
-            {
-                Name = addAnimalRequestDto.Name,
-                Species = addAnimalRequestDto.Species,
-                Breed = addAnimalRequestDto.Breed,
-                DateOfBirth = addAnimalRequestDto.DateOfBirth,
-                Sex = addAnimalRequestDto.Sex,
-                StableId = addAnimalRequestDto.StableId,
-                FarmId = stable.FarmId,
-            };
+            var animalDomain = addAnimalRequestDto.ToAnimalFromCreate(stableId);
 
             animalDomain = await animalRepository.CreateAsync(animalDomain);
-            var animalDto = new Animal
-            {
-                Name = animalDomain.Name,
-                Species = animalDomain.Species,
-                Breed = animalDomain.Breed,
-                DateOfBirth = animalDomain.DateOfBirth,
-                Sex = animalDomain.Sex,
-                StableId = animalDomain.StableId,
-                FarmId = animalDomain.FarmId,
-            };
 
-            return Ok();
+            var animalDto = animalDomain.ToAnimalDto();
+            
+            return CreatedAtAction(nameof(GetById), new { id = animalDomain.Id}, animalDto);
         }
 
         [HttpPut]
@@ -108,34 +67,17 @@ namespace Controllers
             var stable = await stableRepository.GetByIdAsync(updateAnimalRequestDto.StableId);
             if (stable == null)
             {
-                return NotFound($"Stable with ID {updateAnimalRequestDto.StableId} not found.");
+                return NotFound("Stable not found.");
             }
-            var animalDomain = new Animal
-            {
-                Name = updateAnimalRequestDto.Name,
-                Species = updateAnimalRequestDto.Species,
-                Breed = updateAnimalRequestDto.Breed,
-                DateOfBirth = updateAnimalRequestDto.DateOfBirth,
-                Sex = updateAnimalRequestDto.Sex,
-                StableId = updateAnimalRequestDto.StableId,
-                FarmId = stable.FarmId,
-            };
-            animalDomain = await animalRepository.UpdateAsync(id, animalDomain);
+
+            var animalDomain = await animalRepository.UpdateAsync(id, updateAnimalRequestDto.ToAnimalFromUpdate());
+            
             if (animalDomain == null)
             {
-                return NotFound();
+                return NotFound("Animal not found");
             }
-            var animalDto = new Animal
-            {
-                Name = animalDomain.Name,
-                Species = animalDomain.Species,
-                Breed = animalDomain.Breed,
-                DateOfBirth = animalDomain.DateOfBirth,
-                Sex = animalDomain.Sex,
-                StableId = animalDomain.StableId,
-                FarmId = animalDomain.FarmId,
-            };
-            return Ok(animalDto);
+
+            return Ok(animalDomain.ToAnimalDto());
         }
 
         [HttpDelete]
@@ -146,22 +88,11 @@ namespace Controllers
             var animalDomain = await animalRepository.DeleteAsync(id);
             if (animalDomain == null)
             {
-                return NotFound();
+                return NotFound("Animal does not exist");
             }
-            var animalDto = new AnimalDto
-            {
-                Id = animalDomain.Id,
-                Name = animalDomain.Name,
-                Species = animalDomain.Species,
-                Breed = animalDomain.Breed,
-                DateOfBirth = animalDomain.DateOfBirth,
-                Sex = animalDomain.Sex,
-                FarmId = animalDomain.FarmId,
-                StableId = animalDomain.StableId,
-            };
 
-            return Ok(animalDto);
+            return Ok(animalDomain.ToAnimalDto());
         }
 
-     }
+    }
 }

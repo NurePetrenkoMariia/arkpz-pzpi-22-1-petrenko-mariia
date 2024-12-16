@@ -1,4 +1,4 @@
-﻿namespace Models.DTO
+﻿namespace FarmKeeper.Models.DTO
 {
     public class StableDto
     {
@@ -6,7 +6,7 @@
         public int MinFeedLevel { get; set; }
         public int CurrentFeedLevel { get; set; }
         public DateTime DateTimeOfUpdate { get; set; }
-
         public Guid FarmId { get; set; }
+        public List<AnimalDto> Animals { get; set; }
     }
 }

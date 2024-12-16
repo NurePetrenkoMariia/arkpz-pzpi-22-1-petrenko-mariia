@@ -1,8 +1,8 @@
-﻿using Data;
-using Models;
+﻿using FarmKeeper.Data;
+using FarmKeeper.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repositories
+namespace FarmKeeper.Repositories
 {
     public class SQLStableRepository : IStableRepository
     {
@@ -35,12 +35,12 @@ namespace Repositories
 
         public async Task<List<Stable>> GetAllAsync()
         {
-            return await dbContext.Stables.ToListAsync();
+            return await dbContext.Stables.Include(a => a.Animals).ToListAsync();
         }
 
         public async Task<Stable?> GetByIdAsync(Guid id)
         {
-            return await dbContext.Stables.FirstOrDefaultAsync(x => x.Id == id);
+            return await dbContext.Stables.Include(a => a.Animals).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Stable?> UpdateAsync(Guid id, Stable stable)

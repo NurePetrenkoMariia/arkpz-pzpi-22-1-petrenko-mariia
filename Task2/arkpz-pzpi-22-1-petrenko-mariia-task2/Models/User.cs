@@ -1,4 +1,6 @@
-﻿namespace Models
+﻿using FarmKeeper.Enums;
+
+namespace FarmKeeper.Models
 {
     public class User
     {
@@ -10,8 +12,9 @@
         public string Email { get; set; }
         public string PasswordHash { get; set; }
 
-        public Guid RoleId { get; set; }
         public UserRole Role { get; set; }
+        public ICollection<Assignment> Assignments { get; set; }
+        public ICollection<Notification> Notifications { get; set; }
 
         // for worker
         public Guid? FarmId { get; set; }

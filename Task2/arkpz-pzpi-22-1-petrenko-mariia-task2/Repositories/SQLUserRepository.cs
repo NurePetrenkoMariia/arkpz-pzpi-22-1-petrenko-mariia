@@ -1,8 +1,8 @@
-﻿using Data;
-using Models;
+﻿using FarmKeeper.Data;
+using FarmKeeper.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repositories
+namespace FarmKeeper.Repositories
 {
     public class SQLUserRepository : IUserRepository
     {
@@ -35,12 +35,12 @@ namespace Repositories
 
         public async Task<List<User>> GetAllAsync()
         {
-            return await dbContext.Users.ToListAsync();
+            return await dbContext.Users.Include(f => f.Farms).Include(a => a.Assignments).Include(n => n.Notifications).ToListAsync();
         }
 
         public async Task<User?> GetByIdAsync(Guid id)
         {
-            return await dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+            return await dbContext.Users.Include(f => f.Farms).Include(a => a.Assignments).Include(n => n.Notifications).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<User?> UpdateAsync(Guid id, User user)
@@ -58,8 +58,8 @@ namespace Repositories
             existingUser.PhoneNumber = user.PhoneNumber;
             existingUser.Email = user.Email;
             existingUser.PasswordHash = user.PasswordHash;
+            existingUser.Role = user.Role;
             existingUser.FarmId = user.FarmId;
-            existingUser.RoleId = user.RoleId;
 
             await dbContext.SaveChangesAsync();
             return existingUser;

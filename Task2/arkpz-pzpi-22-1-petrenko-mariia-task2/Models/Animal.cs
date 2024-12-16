@@ -1,6 +1,6 @@
-﻿using Enums;
+﻿using FarmKeeper.Enums;
 
-namespace Models
+namespace FarmKeeper.Models
 {
     public class Animal
     {
@@ -10,9 +10,6 @@ namespace Models
         public string Breed { get; set; }
         public DateOnly DateOfBirth { get; set; }
         public Sex Sex { get; set; }
-
-        public Guid FarmId { get; set; }
-        public Farm Farm { get; set; }
         public Guid StableId { get; set; }
         public Stable Stable { get; set; }
     }

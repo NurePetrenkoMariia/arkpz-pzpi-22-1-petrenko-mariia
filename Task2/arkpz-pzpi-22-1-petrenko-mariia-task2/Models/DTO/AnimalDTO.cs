@@ -1,6 +1,6 @@
-﻿using Enums;
+﻿using FarmKeeper.Enums;
 
-namespace Models.DTO
+namespace FarmKeeper.Models.DTO
 {
     public class AnimalDto
     {
@@ -10,8 +10,6 @@ namespace Models.DTO
         public string Breed { get; set; }
         public DateOnly DateOfBirth { get; set; }
         public Sex Sex { get; set; }
-
-        public Guid FarmId { get; set; }
         public Guid StableId { get; set; }
     }
 }

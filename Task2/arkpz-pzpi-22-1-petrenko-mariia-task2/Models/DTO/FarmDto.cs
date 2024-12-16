@@ -1,4 +1,4 @@
-﻿namespace Models.DTO
+﻿namespace FarmKeeper.Models.DTO
 {
     public class FarmDto
     {
@@ -8,6 +8,6 @@
         public string City { get; set; }
         public string Street { get; set; }
         public Guid OwnerId { get; set; }
-       
+        public List<StableDto> Stables { get; set; }
     }
 }

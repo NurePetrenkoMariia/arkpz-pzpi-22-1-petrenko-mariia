@@ -1,37 +1,30 @@
-﻿using Models;
-using Models.DTO;
-using Repositories;
+﻿using FarmKeeper.Mapper;
+using FarmKeeper.Models;
+using FarmKeeper.Models.DTO;
+using FarmKeeper.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Controllers
+namespace FarmKeeper.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class StablesController : ControllerBase
     {
         private readonly IStableRepository stableRepository;
-        public StablesController(IStableRepository stableRepository)
+        private readonly IFarmRepository farmRepository;
+        public StablesController(IStableRepository stableRepository, IFarmRepository farmRepository)
         {
             this.stableRepository = stableRepository;
+            this.farmRepository = farmRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var stableDomain = await stableRepository.GetAllAsync();
-            var stableDto = new List<StableDto>();
-            foreach (var stable in stableDomain)
-            {
-                stableDto.Add(new StableDto()
-                {
-                    Id = stable.Id,
-                    MinFeedLevel = stable.MinFeedLevel,
-                    CurrentFeedLevel = stable.CurrentFeedLevel,
-                    DateTimeOfUpdate = stable.DateTimeOfUpdate,
-                    FarmId = stable.FarmId,
-                });
-            }
+            var stableDto = stableDomain.Select(a => a.ToStableDto());
+
             return Ok(stableDto);
         }
 
@@ -44,41 +37,27 @@ namespace Controllers
             {
                 return NotFound();
             }
-            var stableDto = new StableDto
-            {
-                Id = stableDomain.Id,
-                MinFeedLevel = stableDomain.MinFeedLevel,
-                CurrentFeedLevel = stableDomain.CurrentFeedLevel,
-                DateTimeOfUpdate = stableDomain.DateTimeOfUpdate,
-                FarmId = stableDomain.FarmId,
 
-            };
-            return Ok(stableDto);
+            return Ok(stableDomain.ToStableDto());
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] AddStableRequestDto addStableRequestDto)
+        [HttpPost("{farmId}")]
+        public async Task<IActionResult> Create([FromRoute] Guid farmId, [FromBody] AddStableRequestDto addStableRequestDto)
         {
             if (ModelState.IsValid)
             {
-                var stableDomain = new Stable
+                var farm = await farmRepository.GetByIdAsync(farmId);
+                if (farm == null)
                 {
-                    MinFeedLevel = addStableRequestDto.MinFeedLevel,
-                    CurrentFeedLevel = addStableRequestDto.CurrentFeedLevel,
-                    DateTimeOfUpdate = addStableRequestDto.DateTimeOfUpdate,
-                    FarmId = addStableRequestDto.FarmId,
-                };
+                    return NotFound($"Farm not found.");
+                }
+
+                var stableDomain = addStableRequestDto.ToStableFromCreate(farmId);
 
                 stableDomain = await stableRepository.CreateAsync(stableDomain);
-                var stableDto = new Stable
-                {
-                    MinFeedLevel = stableDomain.MinFeedLevel,
-                    CurrentFeedLevel = stableDomain.CurrentFeedLevel,
-                    DateTimeOfUpdate = stableDomain.DateTimeOfUpdate,
-                    FarmId = stableDomain.FarmId,
-                };
+                var stableDto = stableDomain.ToStableDto();
 
-                return Ok();
+                return CreatedAtAction(nameof(GetById), new { id = stableDomain.Id }, stableDto);
             }
             else
             {
@@ -92,26 +71,19 @@ namespace Controllers
         {
             if (ModelState.IsValid)
             {
-                var stableDomain = new Stable
+                var farm = await farmRepository.GetByIdAsync(updateStableRequestDto.FarmId);
+                if (farm == null)
                 {
-                    MinFeedLevel = updateStableRequestDto.MinFeedLevel,
-                    CurrentFeedLevel = updateStableRequestDto.CurrentFeedLevel,
-                    DateTimeOfUpdate = updateStableRequestDto.DateTimeOfUpdate,
-                    FarmId = updateStableRequestDto.FarmId,
-                };
-                stableDomain = await stableRepository.UpdateAsync(id, stableDomain);
+                    return NotFound($"Farm with ID {updateStableRequestDto.FarmId} not found.");
+                }
+
+                var stableDomain = await stableRepository.UpdateAsync(id, updateStableRequestDto.ToStableFromUpdate());
                 if (stableDomain == null)
                 {
-                    return NotFound();
+                    return NotFound("Stable not found");
                 }
-                var stableDto = new Stable
-                {
-                    MinFeedLevel = stableDomain.MinFeedLevel,
-                    CurrentFeedLevel = stableDomain.CurrentFeedLevel,
-                    DateTimeOfUpdate = stableDomain.DateTimeOfUpdate,
-                    FarmId = stableDomain.FarmId,
-                };
-                return Ok(stableDto);
+                
+                return Ok(stableDomain.ToStableDto());
             }
             else
             {
@@ -127,18 +99,10 @@ namespace Controllers
             var stableDomain = await stableRepository.DeleteAsync(id);
             if (stableDomain == null)
             {
-                return NotFound();
+                return NotFound("Stable does not exist");
             }
-            var stableDto = new StableDto
-            {
-                Id = stableDomain.Id,
-                MinFeedLevel = stableDomain.MinFeedLevel,
-                CurrentFeedLevel = stableDomain.CurrentFeedLevel,
-                DateTimeOfUpdate = stableDomain.DateTimeOfUpdate,
-                FarmId = stableDomain.FarmId,
-            };
 
-            return Ok(stableDto);
+            return Ok(stableDomain.ToStableDto());
         }
     }
 }

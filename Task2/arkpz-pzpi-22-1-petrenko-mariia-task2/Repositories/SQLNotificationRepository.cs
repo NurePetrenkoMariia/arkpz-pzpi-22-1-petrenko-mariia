@@ -1,8 +1,8 @@
-﻿using Data;
-using Models;
+﻿using FarmKeeper.Data;
+using FarmKeeper.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repositories
+namespace FarmKeeper.Repositories
 {
     public class SQLNotificationRepository : INotificationRepository
     {
@@ -55,7 +55,6 @@ namespace Repositories
 
             existingNotification.Title = notification.Title;
             existingNotification.Text = notification.Text;
-            existingNotification.DateTimeCreated = notification.DateTimeCreated;
             existingNotification.UserId = notification.UserId;
 
             await dbContext.SaveChangesAsync();

@@ -1,6 +1,6 @@
-﻿using Models;
+﻿using FarmKeeper.Models;
 
-namespace Repositories
+namespace FarmKeeper.Repositories
 {
     public interface IAssignmentRepository
     {

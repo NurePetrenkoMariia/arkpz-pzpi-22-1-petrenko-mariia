@@ -1,4 +1,6 @@
-﻿namespace Models.DTO
+﻿using FarmKeeper.Enums;
+
+namespace FarmKeeper.Models.DTO
 {
     public class AddUserRequestDto
     {
@@ -8,7 +10,7 @@
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string PasswordHash { get; set; }
+        public UserRole Role { get; set; }
         public Guid? FarmId { get; set; }
-        public Guid RoleId { get; set; }
     }
 }

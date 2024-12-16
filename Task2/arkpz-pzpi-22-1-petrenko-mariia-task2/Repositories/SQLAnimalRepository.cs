@@ -1,8 +1,8 @@
-﻿using Data;
-using Models;
+﻿using FarmKeeper.Data;
+using FarmKeeper.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repositories
+namespace FarmKeeper.Repositories
 {
     public class SQLAnimalRepository : IAnimalRepository
     {
@@ -57,8 +57,7 @@ namespace Repositories
             existingAnimal.Breed = animal.Breed;
             existingAnimal.DateOfBirth = animal.DateOfBirth;
             existingAnimal.Sex = animal.Sex;
-            existingAnimal.FarmId = animal.FarmId;
-            existingAnimal.StableId = animal.StableId ;
+            existingAnimal.StableId = animal.StableId;
 
             await dbContext.SaveChangesAsync();
             return existingAnimal;

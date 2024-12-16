@@ -1,4 +1,4 @@
-﻿namespace Models
+﻿namespace FarmKeeper.Models
 {
     public class Stable
     {
@@ -9,5 +9,6 @@
 
         public Guid FarmId { get; set; }
         public Farm Farm { get; set; }
+        public ICollection<Animal> Animals { get; set; }
     }
 }

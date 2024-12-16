@@ -1,10 +1,11 @@
-﻿using Models;
-using Models.DTO;
-using Repositories;
+﻿using FarmKeeper.Mapper;
+using FarmKeeper.Models;
+using FarmKeeper.Models.DTO;
+using FarmKeeper.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Controllers
+namespace FarmKeeper.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -19,21 +20,9 @@ namespace Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var assignmentsDomain = await assignmentRepository.GetAllAsync();
-            var assignmentsDto = new List<AssignmentDto>();
-            foreach (var assignment in assignmentsDomain)
-            {
-                assignmentsDto.Add(new AssignmentDto()
-                {
-                    Id = assignment.Id,
-                    Name = assignment.Name,
-                    Description = assignment.Description,
-                    NumberOfParticipants = assignment.NumberOfParticipants,
-                    StatusId = assignment.StatusId,
-                    PriorityId = assignment.PriorityId,
-                });
-            }
-            return Ok(assignmentsDto);
+            var assignmentDomain = await assignmentRepository.GetAllAsync();
+            var assignmentDto = assignmentDomain.Select(a => a.ToAssignmentDto());
+            return Ok(assignmentDto);
         }
 
         [HttpGet]
@@ -45,48 +34,20 @@ namespace Controllers
             {
                 return NotFound();
             }
-            var assignmentDto = new AssignmentDto
-            {
-                Id = assignmentDomain.Id,
-                Name = assignmentDomain.Name,
-                Description = assignmentDomain.Description,
-                NumberOfParticipants = assignmentDomain.NumberOfParticipants,
-                StatusId = assignmentDomain.StatusId,
-                PriorityId = assignmentDomain.PriorityId,
-            };
-            return Ok(assignmentDto);
+            
+            return Ok(assignmentDomain.ToAssignmentDto());
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] AddAssignmentRequestDto addAssignmentRequestDto)
         {
-            if (ModelState.IsValid)
-            {
-                var assignmentDomain = new Assignment
-                {
-                    Name = addAssignmentRequestDto.Name,
-                    Description = addAssignmentRequestDto.Description,
-                    NumberOfParticipants = addAssignmentRequestDto.NumberOfParticipants,
-                    StatusId = addAssignmentRequestDto.StatusId,
-                    PriorityId = addAssignmentRequestDto.PriorityId,
-                };
+            var assignmentDomain = addAssignmentRequestDto.ToAssignmentFromCreate();
 
-                assignmentDomain = await assignmentRepository.CreateAsync(assignmentDomain);
-                var assignmentDto = new Assignment
-                {
-                    Name = assignmentDomain.Name,
-                    Description = assignmentDomain.Description,
-                    NumberOfParticipants = assignmentDomain.NumberOfParticipants,
-                    StatusId = assignmentDomain.StatusId,
-                    PriorityId = assignmentDomain.PriorityId,
-                };
+            assignmentDomain = await assignmentRepository.CreateAsync(assignmentDomain);
 
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
+            var assignmentDto = assignmentDomain.ToAssignmentDto();
+
+            return CreatedAtAction(nameof(GetById), new { id = assignmentDomain.Id }, assignmentDto);
         }
 
         [HttpPut]
@@ -94,35 +55,13 @@ namespace Controllers
 
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateAssignmentRequestDto updateAssignmentRequestDto)
         {
-            if (ModelState.IsValid)
+            var assignmentDomain = await assignmentRepository.UpdateAsync(id, updateAssignmentRequestDto.ToAssignmentFromUpdate());
+            if (assignmentDomain == null)
             {
-                var assignmentDomain = new Assignment
-                {
-                    Name = updateAssignmentRequestDto.Name,
-                    Description = updateAssignmentRequestDto.Description,
-                    NumberOfParticipants = updateAssignmentRequestDto.NumberOfParticipants,
-                    StatusId = updateAssignmentRequestDto.StatusId,
-                    PriorityId = updateAssignmentRequestDto.PriorityId,
-                };
-                assignmentDomain = await assignmentRepository.UpdateAsync(id, assignmentDomain);
-                if (assignmentDomain == null)
-                {
-                    return NotFound();
-                }
-                var assignmentDto = new Assignment
-                {
-                    Name = assignmentDomain.Name,
-                    Description = assignmentDomain.Description,
-                    NumberOfParticipants = assignmentDomain.NumberOfParticipants,
-                    StatusId = assignmentDomain.StatusId,
-                    PriorityId = assignmentDomain.PriorityId,
-                };
-                return Ok(assignmentDto);
+                return NotFound("Assignment not found");
             }
-            else
-            {
-                return BadRequest();
-            }
+
+            return Ok(assignmentDomain.ToAssignmentDto());
         }
 
         [HttpDelete]
@@ -133,19 +72,10 @@ namespace Controllers
             var assignmentDomain = await assignmentRepository.DeleteAsync(id);
             if (assignmentDomain == null)
             {
-                return NotFound();
+                return NotFound("Assignment does not exist");
             }
-            var assignmentDto = new AssignmentDto
-            {
-                Id = assignmentDomain.Id,
-                Name = assignmentDomain.Name,
-                Description = assignmentDomain.Description,
-                NumberOfParticipants = assignmentDomain.NumberOfParticipants,
-                StatusId = assignmentDomain.StatusId,
-                PriorityId = assignmentDomain.PriorityId,
-            };
 
-            return Ok(assignmentDto);
+            return Ok(assignmentDomain.ToAssignmentDto());
         }
 
     }

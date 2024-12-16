@@ -1,39 +1,31 @@
-﻿using Models;
-using Models.DTO;
-using Repositories;
+﻿using FarmKeeper.Mapper;
+using FarmKeeper.Models;
+using FarmKeeper.Models.DTO;
+using FarmKeeper.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace Controllers
+namespace FarmKeeper.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationsController : ControllerBase
     {
         private readonly INotificationRepository notificationRepository;
-        public NotificationsController(INotificationRepository notificationRepository)
+        private readonly IUserRepository userRepository;
+        public NotificationsController(INotificationRepository notificationRepository, IUserRepository userRepository)
         {
             this.notificationRepository = notificationRepository;
+            this.userRepository = userRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var notificationsDomain = await notificationRepository.GetAllAsync();
-            var notificationsDto = new List<NotificationDto>();
-            foreach (var notification in notificationsDomain)
-            {
-                notificationsDto.Add(new NotificationDto()
-                {
-                    Id = notification.Id,
-                    Title = notification.Title,
-                    Text = notification.Text,
-                    DateTimeCreated = notification.DateTimeCreated,
-                    UserId = notification.UserId,
-                });
-            }
-            return Ok(notificationsDto);
+            var notificationDomain = await notificationRepository.GetAllAsync();
+            var notificationDto = notificationDomain.Select(n => n.ToNotificationDto());
+            return Ok(notificationDto);
         }
 
         [HttpGet]
@@ -45,65 +37,45 @@ namespace Controllers
             {
                 return NotFound();
             }
-            var notificationDto = new NotificationDto
-            {
-                Id = notificationDomain.Id,
-                Title = notificationDomain.Title,
-                Text = notificationDomain.Text,
-                DateTimeCreated = notificationDomain.DateTimeCreated,
-                UserId = notificationDomain.UserId,
-
-            };
-            return Ok(notificationDto);
+   
+            return Ok(notificationDomain.ToNotificationDto());
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] AddNotificationRequestDto addNotificationRequestDto)
+        [HttpPost("{userId}")]
+        public async Task<IActionResult> Create([FromRoute] Guid userId, [FromBody] AddNotificationRequestDto addNotificationRequestDto)
         {
-            var notificationDomain = new Notification
+            var user = await userRepository.GetByIdAsync(userId);
+            if (user == null)
             {
-                Title = addNotificationRequestDto.Title,
-                Text = addNotificationRequestDto.Text,
-                DateTimeCreated = addNotificationRequestDto.DateTimeCreated,
-                UserId = addNotificationRequestDto.UserId,
-            };
+                return NotFound("User not found.");
+            }
+
+            var notificationDomain = addNotificationRequestDto.ToNotificationFromCreate(userId);
 
             notificationDomain = await notificationRepository.CreateAsync(notificationDomain);
-            var notificationDto = new Notification
-            {
-                Title = notificationDomain.Title,
-                Text = notificationDomain.Text,
-                DateTimeCreated = notificationDomain.DateTimeCreated,
-                UserId = notificationDomain.UserId,
-            };
 
-            return Ok();
+            var notificationDto = notificationDomain.ToNotificationDto();
+
+            return CreatedAtAction(nameof(GetById), new { id = notificationDomain.Id }, notificationDto);
         }
 
         [HttpPut]
         [Route("{id:Guid}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateNotificationRequestDto updateNotificationRequestDto)
         {
-            var notificationDomain = new Notification
+            var user = await userRepository.GetByIdAsync(updateNotificationRequestDto.UserId);
+            if (user == null)
             {
-                Title = updateNotificationRequestDto.Title,
-                Text= updateNotificationRequestDto.Text,
-                DateTimeCreated = updateNotificationRequestDto.DateTimeCreated,
-                UserId = updateNotificationRequestDto.UserId,
-            };
-            notificationDomain = await notificationRepository.UpdateAsync(id, notificationDomain);
+                return NotFound("User not found.");
+            }
+
+            var notificationDomain = await notificationRepository.UpdateAsync(id, updateNotificationRequestDto.ToNotificationFromUpdate());
             if (notificationDomain == null)
             {
-                return NotFound();
+                return NotFound("Notification not found");
             }
-            var notificationDto = new Notification
-            {
-                Title = notificationDomain.Title,
-                Text = notificationDomain.Text,
-                DateTimeCreated = notificationDomain.DateTimeCreated,
-                UserId = notificationDomain.UserId,
-            };
-            return Ok(notificationDto);
+     
+            return Ok(notificationDomain.ToNotificationDto());
         }
 
         [HttpDelete]
@@ -114,18 +86,10 @@ namespace Controllers
             var notificationDomain = await notificationRepository.DeleteAsync(id);
             if (notificationDomain == null)
             {
-                return NotFound();
+                return NotFound("Notification does not exist");
             }
-            var notificationDto = new NotificationDto
-            {
-                Id = notificationDomain.Id,
-                Title = notificationDomain.Title,
-                Text = notificationDomain.Text,
-                DateTimeCreated = notificationDomain.DateTimeCreated,
-                UserId = notificationDomain.UserId,
-            };
-
-            return Ok(notificationDto);
+         
+            return Ok(notificationDomain.ToNotificationDto());
         }
     }
 }

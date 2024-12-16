@@ -1,8 +1,8 @@
-﻿using Data;
-using Models;
+﻿using FarmKeeper.Data;
+using FarmKeeper.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repositories
+namespace FarmKeeper.Repositories
 {
     public class SQLAssignmentRepository : IAssignmentRepository
     {
@@ -54,9 +54,8 @@ namespace Repositories
 
             existingAssignment.Name = assignment.Name;
             existingAssignment.Description = assignment.Description;
-            existingAssignment.NumberOfParticipants = assignment.NumberOfParticipants;
-            existingAssignment.StatusId = assignment.StatusId;
-            existingAssignment.PriorityId = assignment.PriorityId;
+            existingAssignment.Status = assignment.Status;
+            existingAssignment.Priority = assignment.Priority;
 
             await dbContext.SaveChangesAsync();
             return existingAssignment;
