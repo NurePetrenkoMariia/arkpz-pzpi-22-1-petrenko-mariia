@@ -58,42 +58,27 @@ namespace FarmKeeper
             builder.Services.AddDbContext<FarmKeeperDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("FarmKeeperConnectionString")));
 
-            //builder.Services.AddAuthentication(options =>
-            //{
-            //    options.DefaultAuthenticateScheme = 
-            //    options.DefaultChallengeScheme = 
-            //    options.DefaultForbidScheme =
-            //    options.DefaultScheme = 
-            //    options.DefaultSignInScheme = 
-            //    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-            //} ).AddJwtBearer(options =>
-            //{
-            //    //options.MapInboundClaims = false; 
-            //    options.TokenValidationParameters = new TokenValidationParameters
-            //    {
-            //        ValidateIssuer = false,
-            //        ValidateAudience = false,
-            //        ValidateIssuerSigningKey = true,
-            //        IssuerSigningKey = new SymmetricSecurityKey(
-            //           System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])
-            //        )
-            //    };
-            //});
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-       // options.MapInboundClaims = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-               System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])
-            ),
-            RoleClaimType = ClaimTypes.Role
-        };
-    });
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme =
+                options.DefaultChallengeScheme =
+                options.DefaultForbidScheme =
+                options.DefaultScheme =
+                options.DefaultSignInScheme =
+                options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                       System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])
+                    )
+                };
+            });
+
             builder.Services.AddScoped<IAnimalRepository, SQLAnimalRepository>();
             builder.Services.AddScoped<IFarmRepository, SQLFarmRepository>();
             builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
