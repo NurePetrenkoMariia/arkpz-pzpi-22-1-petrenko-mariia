@@ -1,12 +1,16 @@
-﻿using Mappers;
-using Models;
-using Models.DTO;
-using Repositories;
+﻿using FarmKeeper.Enums;
+using FarmKeeper.Mappers;
+using FarmKeeper.Models;
+using FarmKeeper.Models.DTO;
+using FarmKeeper.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
-namespace Controllers
+namespace FarmKeeper.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -21,33 +25,72 @@ namespace Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Owner")]
         public async Task<IActionResult> GetAll()
         {
-            var farmDomain = await farmRepository.GetAllAsync();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            var role = User.FindFirstValue(ClaimTypes.Role);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found.");
+            }
+
+            List<Farm> farmDomain;
+
+            //if (role == nameof(UserRole.DatabaseAdmin))
+            //{
+            //    farmDomain = await farmRepository.GetAllAsync();
+            //}
+
+            if(role == "Owner")
+            {
+                var ownerId = Guid.Parse(userId);
+                farmDomain = await farmRepository.GetFarmsByOwnerIdAsync(ownerId);
+            }
+
+            //TO DO: add logic for other roles
+            else
+            {
+                farmDomain = await farmRepository.GetAllAsync();
+            }
+
             var farmDto = farmDomain.Select(f => f.ToFarmDto());
             return Ok(farmDto);
         }
 
         [HttpGet]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found.");
+            }
+
             var farmDomain = await farmRepository.GetByIdAsync(id);
             if (farmDomain == null)
             {
                 return NotFound();
             }
-            
+
+            if (userRole == "Owner" && farmDomain.OwnerId != Guid.Parse(userId))
+            {
+                return Forbid("You do not have access to this farm.");
+            }
+
             return Ok(farmDomain.ToFarmDto());
         }
 
         [HttpPost("{ownerId}")]
-        [Authorize]
+        [Authorize(Roles = "Owner")]
         public async Task<IActionResult> Create([FromRoute] Guid ownerId, [FromBody] AddFarmRequestDto addFarmRequestDto)
         {
-
             var user = await userRepository.GetByIdAsync(ownerId);
             if (user == null)
             {
@@ -63,35 +106,60 @@ namespace Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateFarmRequestDto updateFarmRequestDto)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found.");
+            }
+
             var user = await userRepository.GetByIdAsync(updateFarmRequestDto.OwnerId);
             if (user == null)
             {
-                return NotFound($"User not found.");
+                return NotFound("User not found.");
             }
 
-            var farmDomain = await farmRepository.UpdateAsync(id, updateFarmRequestDto.ToFarmFromUpdate());
+            var farmDomain = await farmRepository.GetByIdAsync(id);
             if (farmDomain == null)
             {
                 return NotFound("Farm not found");
             }
-            
+
+            if (farmDomain.OwnerId != Guid.Parse(userId))
+            {
+                return Forbid("You do not have access to update this farm.");
+            }
+
+            farmDomain = await farmRepository.UpdateAsync(id, updateFarmRequestDto.ToFarmFromUpdate());
             return Ok(farmDomain.ToFarmDto());
         }
 
         [HttpDelete]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            var farmDomain = await farmRepository.DeleteAsync(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found.");
+            }
+
+            var farmDomain = await farmRepository.GetByIdAsync(id);
+
             if (farmDomain == null)
             {
                 return NotFound("Farm does not exist");
             }
 
+            if (farmDomain.OwnerId != Guid.Parse(userId))
+            {
+                return Forbid("You do not have access to delete this farm.");
+            }
+
+            farmDomain = await farmRepository.DeleteAsync(id);
             return Ok(farmDomain.ToFarmDto());
         }
     }

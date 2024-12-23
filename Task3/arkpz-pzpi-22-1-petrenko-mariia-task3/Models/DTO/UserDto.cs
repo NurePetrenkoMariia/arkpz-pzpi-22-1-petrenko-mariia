@@ -1,6 +1,6 @@
-﻿using Enums;
+﻿using FarmKeeper.Enums;
 
-namespace Models.DTO
+namespace FarmKeeper.Models.DTO
 {
     public class UserDto
     {
@@ -13,6 +13,7 @@ namespace Models.DTO
         public string PasswordHash { get; set; }
         public UserRole Role { get; set; }
         public Guid? FarmId { get; set; }
+        public Guid? AdministeredFarmId { get; set; }
         public List<FarmDto> Farms { get; set; }
         public List<NotificationDto> Notifications { get; set; }
         public List<AssignmentDto> Assignments { get; set; }

@@ -1,23 +1,28 @@
-﻿using Mappers;
-using Models;
-using Models.DTO;
-using Repositories;
+﻿using FarmKeeper.Enums;
+using FarmKeeper.Mappers;
+using FarmKeeper.Models;
+using FarmKeeper.Models.DTO;
+using FarmKeeper.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Controllers
+namespace FarmKeeper.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly IUserRepository userRepository;
-        public UsersController(IUserRepository userRepository)
+
+        private readonly IFarmRepository farmRepository;
+
+        public UsersController(IUserRepository userRepository, IFarmRepository farmRepository)
         {
             this.userRepository = userRepository;
+            this.farmRepository = farmRepository;
         }
 
         [HttpGet]
@@ -84,5 +89,35 @@ namespace Controllers
             return Ok(userDomain.ToUserDto());
         }
 
+        [HttpPost("add-admin/{farmId}")]
+        [Authorize(Roles = "Owner")]
+        public async Task<IActionResult> AddAdminToFarm(Guid farmId, [FromBody] AddAdminRequestDto addAdminRequestDto)
+        {
+            var farm = await farmRepository.GetByIdAsync(farmId);
+            if (farm == null)
+            {
+                return NotFound("Farm not found.");
+            }
+
+            var newAdmin = new User
+            {
+                Id = Guid.NewGuid(),
+                FirstName = addAdminRequestDto.FirstName,
+                LastName = addAdminRequestDto.LastName,
+                DateOfBirth = addAdminRequestDto.DateOfBirth,
+                PhoneNumber = addAdminRequestDto.PhoneNumber,
+                Email = addAdminRequestDto.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(addAdminRequestDto.Password),
+                Role = UserRole.Admin,
+                FarmId = farmId
+            };
+
+            farm.Administrators.Add(newAdmin);
+
+            var adminDomain = await userRepository.CreateAsync(newAdmin);
+
+            return CreatedAtAction(nameof(GetById), new { id = newAdmin.Id }, newAdmin.ToUserDto());
+
+        }
     }
 }

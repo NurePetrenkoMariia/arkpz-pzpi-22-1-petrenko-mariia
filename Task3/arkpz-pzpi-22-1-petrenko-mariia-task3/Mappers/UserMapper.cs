@@ -1,7 +1,7 @@
-﻿using Models.DTO;
-using Models;
+﻿using FarmKeeper.Models.DTO;
+using FarmKeeper.Models;
 
-namespace Mappers
+namespace FarmKeeper.Mappers
 {
     public static class UserMapper
     {
@@ -18,6 +18,7 @@ namespace Mappers
                 PasswordHash = userDomain.PasswordHash,
                 Role = userDomain.Role,
                 FarmId = userDomain.FarmId,
+                AdministeredFarmId = userDomain.AdministeredFarmId,
                 Farms = userDomain.Farms?.Select(f => f.ToFarmDto()).ToList(),
                 Notifications = userDomain.Notifications?.Select(n => n.ToNotificationDto()).ToList(),
                 Assignments = userDomain.Assignments?.Select(n => n.ToAssignmentDto()).ToList(),
@@ -36,6 +37,7 @@ namespace Mappers
                 PasswordHash = addUserRequestDto.PasswordHash,
                 Role = addUserRequestDto.Role,
                 FarmId = addUserRequestDto.FarmId,
+                AdministeredFarmId = addUserRequestDto.AdministeredFarmId,
             };
         }
 
@@ -51,8 +53,8 @@ namespace Mappers
                 PasswordHash = updateUserRequestDto.PasswordHash,
                 Role = updateUserRequestDto.Role,
                 FarmId = updateUserRequestDto.FarmId,
+                AdministeredFarmId = updateUserRequestDto.AdministeredFarmId
             };
         }
-
     }
 }

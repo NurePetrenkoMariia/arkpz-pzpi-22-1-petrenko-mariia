@@ -1,6 +1,6 @@
-﻿using Enums;
+﻿using FarmKeeper.Enums;
 
-namespace Models.DTO
+namespace FarmKeeper.Models.DTO
 {
     public class AnimalDto
     {

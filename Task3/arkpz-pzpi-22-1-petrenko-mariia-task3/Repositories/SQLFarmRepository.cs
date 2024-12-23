@@ -1,12 +1,12 @@
-﻿using Data;
-using Enums;
-using Models;
-using Models.DTO;
+﻿using FarmKeeper.Data;
+using FarmKeeper.Enums;
+using FarmKeeper.Models;
+using FarmKeeper.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
 using System.IO;
 
-namespace Repositories
+namespace FarmKeeper.Repositories
 {
     public class SQLFarmRepository : IFarmRepository
     {
@@ -39,12 +39,23 @@ namespace Repositories
 
         public async Task<List<Farm>> GetAllAsync()
         {
-            return await dbContext.Farms.Include(f => f.Stables).ThenInclude(s => s.Animals).ToListAsync();
+            return await dbContext.Farms.Include(u => u.Workers).Include(u => u.Administrators).Include(f => f.Stables).ThenInclude(s => s.Animals).ToListAsync();
+        }
+
+        public async Task<List<Farm>> GetFarmsByOwnerIdAsync(Guid ownerId)
+        {
+            return await dbContext.Farms
+                .Where(farm => farm.OwnerId == ownerId)
+                .Include(u => u.Workers)
+                .Include(u => u.Administrators)
+                .Include(f => f.Stables)
+                .ThenInclude(s => s.Animals)
+                .ToListAsync();
         }
 
         public async Task<Farm?> GetByIdAsync(Guid id)
         {
-            return await dbContext.Farms.Include(s => s.Stables).ThenInclude(s => s.Animals).FirstOrDefaultAsync(x => x.Id == id);
+            return await dbContext.Farms.Include(u => u.Workers).Include(u => u.Administrators).Include(s => s.Stables).ThenInclude(s => s.Animals).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Farm?> UpdateAsync(Guid id, Farm farm)

@@ -1,6 +1,6 @@
-﻿using Models;
+﻿using FarmKeeper.Models;
 
-namespace Repositories
+namespace FarmKeeper.Repositories
 {
     public interface IUserRepository
     {
@@ -10,5 +10,8 @@ namespace Repositories
         Task<User?> UpdateAsync(Guid id, User user);
         Task<User?> DeleteAsync(Guid id);
         Task<User?> GetByEmailAsync(string email);
+        Task<List<User>> GetWorkersForAssignmentsAsync();
+        Task<User> AddAdminToFarmAsync(User user);
+
     }
 }

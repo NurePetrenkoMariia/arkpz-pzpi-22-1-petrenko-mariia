@@ -1,12 +1,12 @@
-﻿using Models;
-using Repositories;
+﻿using FarmKeeper.Models;
+using FarmKeeper.Repositories;
 using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Service
+namespace FarmKeeper.Service
 {
     public class TokenService : ITokenService
     {
@@ -24,6 +24,7 @@ namespace Service
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
             if (user.FarmId.HasValue)

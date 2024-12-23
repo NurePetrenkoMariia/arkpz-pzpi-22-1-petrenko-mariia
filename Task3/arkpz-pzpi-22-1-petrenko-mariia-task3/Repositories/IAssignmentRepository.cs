@@ -1,6 +1,6 @@
-﻿using Models;
+﻿using FarmKeeper.Models;
 
-namespace Repositories
+namespace FarmKeeper.Repositories
 {
     public interface IAssignmentRepository
     {
@@ -9,5 +9,6 @@ namespace Repositories
         Task<Assignment> CreateAsync(Assignment assignment);
         Task<Assignment?> UpdateAsync(Guid id, Assignment assignment);
         Task<Assignment?> DeleteAsync(Guid id);
+        Task<List<Assignment>> GetNotStartedAssignmentsAsync();
     }
 }

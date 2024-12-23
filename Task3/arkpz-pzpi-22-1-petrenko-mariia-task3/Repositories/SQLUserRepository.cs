@@ -1,8 +1,9 @@
-﻿using Data;
-using Models;
+﻿using FarmKeeper.Data;
+using FarmKeeper.Enums;
+using FarmKeeper.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repositories
+namespace FarmKeeper.Repositories
 {
     public class SQLUserRepository : IUserRepository
     {
@@ -10,6 +11,13 @@ namespace Repositories
         public SQLUserRepository(FarmKeeperDbContext dbContext)
         {
             this.dbContext = dbContext;
+        }
+
+        public async Task<User> AddAdminToFarmAsync(User admin)
+        {
+            await dbContext.Users.AddAsync(admin);
+            await dbContext.SaveChangesAsync();
+            return admin;
         }
 
         public async Task<User> CreateAsync(User user)
@@ -48,6 +56,14 @@ namespace Repositories
             return await dbContext.Users.Include(f => f.Farms).ThenInclude(f => f.Stables).ThenInclude(s => s.Animals).Include(a => a.Assignments).Include(n => n.Notifications).FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<List<User>> GetWorkersForAssignmentsAsync()
+        {
+            return await dbContext.Users
+                .Where(u => u.Role == UserRole.Worker && u.FarmId.HasValue)
+                .Include(u => u.Assignments)
+                .ToListAsync();
+        }
+
         public async Task<User?> UpdateAsync(Guid id, User user)
         {
             var existingUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
@@ -65,6 +81,7 @@ namespace Repositories
             existingUser.PasswordHash = user.PasswordHash;
             existingUser.Role = user.Role;
             existingUser.FarmId = user.FarmId;
+            existingUser.AdministeredFarmId = user.AdministeredFarmId;
 
             await dbContext.SaveChangesAsync();
             return existingUser;

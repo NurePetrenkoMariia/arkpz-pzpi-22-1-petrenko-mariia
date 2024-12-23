@@ -1,12 +1,13 @@
 
-using Data;
-using Repositories;
-using Service;
+using FarmKeeper.Data;
+using FarmKeeper.Repositories;
+using FarmKeeper.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 
 namespace FarmKeeper
 {
@@ -57,26 +58,42 @@ namespace FarmKeeper
             builder.Services.AddDbContext<FarmKeeperDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("FarmKeeperConnectionString")));
 
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = 
-                options.DefaultChallengeScheme =
-                options.DefaultForbidScheme =
-                options.DefaultScheme = 
-                options.DefaultSignInScheme = 
-                options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-            } ).AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                       System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])
-                    )
-                };
-            });
+            //builder.Services.AddAuthentication(options =>
+            //{
+            //    options.DefaultAuthenticateScheme = 
+            //    options.DefaultChallengeScheme = 
+            //    options.DefaultForbidScheme =
+            //    options.DefaultScheme = 
+            //    options.DefaultSignInScheme = 
+            //    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+            //} ).AddJwtBearer(options =>
+            //{
+            //    //options.MapInboundClaims = false; 
+            //    options.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateIssuer = false,
+            //        ValidateAudience = false,
+            //        ValidateIssuerSigningKey = true,
+            //        IssuerSigningKey = new SymmetricSecurityKey(
+            //           System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])
+            //        )
+            //    };
+            //});
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+       // options.MapInboundClaims = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+               System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])
+            ),
+            RoleClaimType = ClaimTypes.Role
+        };
+    });
             builder.Services.AddScoped<IAnimalRepository, SQLAnimalRepository>();
             builder.Services.AddScoped<IFarmRepository, SQLFarmRepository>();
             builder.Services.AddScoped<IUserRepository, SQLUserRepository>();
@@ -84,7 +101,8 @@ namespace FarmKeeper
             builder.Services.AddScoped<IAssignmentRepository, SQLAssignmentRepository>();
             builder.Services.AddScoped<INotificationRepository, SQLNotificationRepository>();
             builder.Services.AddScoped<ITokenService, TokenService>();
-
+            builder.Services.AddScoped<IUserTaskRepository, SQLUserTaskRepository>();
+            builder.Services.AddScoped<ITaskAssignmentService, TaskAssignmentService>();
 
             var app = builder.Build();
 

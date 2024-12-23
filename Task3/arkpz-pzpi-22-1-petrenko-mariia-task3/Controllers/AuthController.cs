@@ -1,11 +1,11 @@
-﻿using Enums;
-using Models;
-using Models.DTO;
-using Repositories;
+﻿using FarmKeeper.Enums;
+using FarmKeeper.Models;
+using FarmKeeper.Models.DTO;
+using FarmKeeper.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Controllers
+namespace FarmKeeper.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -20,7 +20,7 @@ namespace Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] AddAdminUserRequestDto request)
+        public async Task<IActionResult> Register([FromBody] RegisterUserRequestDto request)
         {
             var existingUser = await userRepository.GetByEmailAsync(request.Email);
             if (existingUser != null)
@@ -39,7 +39,7 @@ namespace Controllers
                 PhoneNumber = request.PhoneNumber,
                 Email = request.Email,
                 PasswordHash = passwordHash,
-                Role = UserRole.Admin, 
+                Role = UserRole.Owner, 
                 Farms = new List<Farm>() 
             };
 

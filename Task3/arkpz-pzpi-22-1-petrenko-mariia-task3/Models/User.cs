@@ -1,6 +1,6 @@
-﻿using Enums;
+﻿using FarmKeeper.Enums;
 
-namespace Models
+namespace FarmKeeper.Models
 {
     public class User
     {
@@ -22,5 +22,9 @@ namespace Models
 
         // for owner
         public ICollection<Farm> Farms { get; set; }
+
+        //for farm admin
+        public Guid? AdministeredFarmId { get; set; }  
+        public Farm AdministeredFarm { get; set; }
     }
 }

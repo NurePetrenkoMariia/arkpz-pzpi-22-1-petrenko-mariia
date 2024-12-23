@@ -1,8 +1,9 @@
-﻿using Data;
-using Models;
+﻿using FarmKeeper.Data;
+using FarmKeeper.Enums;
+using FarmKeeper.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repositories
+namespace FarmKeeper.Repositories
 {
     public class SQLAssignmentRepository : IAssignmentRepository
     {
@@ -41,6 +42,13 @@ namespace Repositories
         public async Task<Assignment?> GetByIdAsync(Guid id)
         {
             return await dbContext.Assignments.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<List<Assignment>> GetNotStartedAssignmentsAsync()
+        {
+            return await dbContext.Assignments
+                .Where(a => a.Status == Status.NotStarted)
+                .ToListAsync();
         }
 
         public async Task<Assignment?> UpdateAsync(Guid id, Assignment assignment)

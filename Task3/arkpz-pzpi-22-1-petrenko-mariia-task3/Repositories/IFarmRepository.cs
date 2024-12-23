@@ -1,6 +1,7 @@
-﻿using Models;
+﻿using FarmKeeper.Models;
+using System.Threading.Tasks;
 
-namespace Repositories
+namespace FarmKeeper.Repositories
 {
     public interface IFarmRepository
     {
@@ -9,5 +10,6 @@ namespace Repositories
         Task<Farm> CreateAsync(Farm farm);
         Task<Farm?> UpdateAsync(Guid id, Farm farm);
         Task<Farm?> DeleteAsync(Guid id);
+        Task<List<Farm>> GetFarmsByOwnerIdAsync(Guid ownerId);
     }
 }

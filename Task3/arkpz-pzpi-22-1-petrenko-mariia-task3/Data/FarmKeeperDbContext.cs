@@ -1,8 +1,8 @@
-﻿using Models;
+﻿using FarmKeeper.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata.Ecma335;
 
-namespace Data
+namespace FarmKeeper.Data
 {
     public class FarmKeeperDbContext: DbContext
     {
@@ -31,6 +31,12 @@ namespace Data
                 .HasOne(f => f.Owner) 
                 .WithMany(u => u.Farms)
                 .HasForeignKey(f => f.OwnerId)  
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.AdministeredFarm)
+                .WithMany(f => f.Administrators)
+                .HasForeignKey(u => u.AdministeredFarmId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Animal>()

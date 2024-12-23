@@ -1,12 +1,12 @@
-﻿using Mappers;
-using Models;
-using Models.DTO;
-using Repositories;
+﻿using FarmKeeper.Mappers;
+using FarmKeeper.Models;
+using FarmKeeper.Models.DTO;
+using FarmKeeper.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Controllers
+namespace FarmKeeper.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -53,7 +53,7 @@ namespace Controllers
                 var farm = await farmRepository.GetByIdAsync(farmId);
                 if (farm == null)
                 {
-                    return NotFound($"Farm not found.");
+                    return NotFound("Farm not found.");
                 }
 
                 var stableDomain = addStableRequestDto.ToStableFromCreate(farmId);

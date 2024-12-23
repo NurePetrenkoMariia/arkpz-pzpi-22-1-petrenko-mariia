@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Models.DTO
+namespace FarmKeeper.Models.DTO
 {
     public class LoginDto
     {
