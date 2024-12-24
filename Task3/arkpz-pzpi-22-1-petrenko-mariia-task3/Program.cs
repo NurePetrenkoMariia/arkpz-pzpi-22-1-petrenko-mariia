@@ -1,5 +1,7 @@
 
 using FarmKeeper.Data;
+using FarmKeeper.Enums;
+using FarmKeeper.Models;
 using FarmKeeper.Repositories;
 using FarmKeeper.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,7 +15,7 @@ namespace FarmKeeper
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +70,7 @@ namespace FarmKeeper
                 options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
+                //options.MapInboundClaims = false; 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = false,
@@ -88,8 +91,16 @@ namespace FarmKeeper
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IUserTaskRepository, SQLUserTaskRepository>();
             builder.Services.AddScoped<ITaskAssignmentService, TaskAssignmentService>();
+            builder.Services.AddScoped<SeedDbService>();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var seedDbService = services.GetRequiredService<SeedDbService>();
+                await seedDbService.SeedAdminUserAsync();
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -97,6 +108,7 @@ namespace FarmKeeper
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
 
             app.UseHttpsRedirection();
 
@@ -108,5 +120,6 @@ namespace FarmKeeper
 
             app.Run();
         }
+        
     }
 }

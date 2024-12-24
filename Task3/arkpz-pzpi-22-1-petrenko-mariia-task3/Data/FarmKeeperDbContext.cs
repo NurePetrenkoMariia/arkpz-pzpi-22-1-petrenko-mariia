@@ -1,4 +1,6 @@
-﻿using FarmKeeper.Models;
+﻿using FarmKeeper.Enums;
+//using FarmKeeper.Migrations;
+using FarmKeeper.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata.Ecma335;
 
@@ -43,7 +45,7 @@ namespace FarmKeeper.Data
                  .HasOne(a => a.Stable)
                  .WithMany(s => s.Animals)
                  .HasForeignKey(a => a.StableId)
-                 .OnDelete(DeleteBehavior.Restrict); 
+                 .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
         }
