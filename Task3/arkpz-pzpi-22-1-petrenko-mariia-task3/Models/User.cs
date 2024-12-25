@@ -13,8 +13,6 @@ namespace FarmKeeper.Models
         public string PasswordHash { get; set; }
 
         public UserRole Role { get; set; }
-        //public ICollection<Assignment> Assignments { get; set; }
-        //public ICollection<UserTask> UserTasks { get; set; } = new List<UserTask>();
         public ICollection<Notification> Notifications { get; set; }
 
         // for worker

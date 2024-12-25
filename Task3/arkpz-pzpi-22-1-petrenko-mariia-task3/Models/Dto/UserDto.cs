@@ -16,8 +16,6 @@ namespace FarmKeeper.Models.DTO
         public Guid? AdministeredFarmId { get; set; }
         public List<FarmDto> Farms { get; set; }
         public List<NotificationDto> Notifications { get; set; }
-        //public List<AssignmentDto> Assignments { get; set; }
-        //public ICollection<UserTaskDto> UserTasks { get; set; }
 
     }
 }
