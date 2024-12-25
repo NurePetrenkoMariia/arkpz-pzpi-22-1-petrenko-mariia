@@ -25,7 +25,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Owner")]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetAll()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -39,19 +39,13 @@ namespace FarmKeeper.Controllers
 
             List<Farm> farmDomain;
 
-            //if (role == nameof(UserRole.DatabaseAdmin))
-            //{
-            //    farmDomain = await farmRepository.GetAllAsync();
-            //}
-
-            if(role == "Owner")
+            if (role == "Owner")
             {
                 var ownerId = Guid.Parse(userId);
                 farmDomain = await farmRepository.GetFarmsByOwnerIdAsync(ownerId);
             }
 
-            //TO DO: add logic for other roles
-            else
+            else 
             {
                 farmDomain = await farmRepository.GetAllAsync();
             }
@@ -62,7 +56,7 @@ namespace FarmKeeper.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        [Authorize(Roles = "Owner")]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -88,7 +82,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpPost("{ownerId}")]
-        [Authorize(Roles = "Owner")]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Create([FromRoute] Guid ownerId, [FromBody] AddFarmRequestDto addFarmRequestDto)
         {
             var user = await userRepository.GetByIdAsync(ownerId);
@@ -106,7 +100,7 @@ namespace FarmKeeper.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        [Authorize(Roles = "Owner")]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateFarmRequestDto updateFarmRequestDto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -138,7 +132,7 @@ namespace FarmKeeper.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
-        [Authorize(Roles = "Owner")]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

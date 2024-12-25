@@ -21,7 +21,6 @@ namespace FarmKeeper.Mappers
                 AdministeredFarmId = userDomain.AdministeredFarmId,
                 Farms = userDomain.Farms?.Select(f => f.ToFarmDto()).ToList(),
                 Notifications = userDomain.Notifications?.Select(n => n.ToNotificationDto()).ToList(),
-                Assignments = userDomain.Assignments?.Select(n => n.ToAssignmentDto()).ToList(),
             };
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
@@ -15,6 +16,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpGet("download-backup")]
+        [Authorize(Roles = "DatabaseAdmin")]
         public async Task<IActionResult> DownloadBackup()
         {
             string downloadPath = Path.Combine(
@@ -56,6 +58,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpPost("restore-database")]
+        [Authorize(Roles = "DatabaseAdmin")]
         public async Task<IActionResult> RestoreDatabase(IFormFile backupFile)
         {
             if (backupFile == null || backupFile.Length == 0)

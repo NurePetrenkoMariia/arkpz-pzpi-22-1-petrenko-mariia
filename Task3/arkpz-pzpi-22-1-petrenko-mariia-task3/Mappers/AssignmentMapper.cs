@@ -1,7 +1,7 @@
-﻿using Models.DTO;
-using Models;
+﻿using FarmKeeper.Models.DTO;
+using FarmKeeper.Models;
 
-namespace Mappers
+namespace FarmKeeper.Mappers
 {
     public static class AssignmentMapper
     {
@@ -12,6 +12,7 @@ namespace Mappers
                 Id = assignmentDomain.Id,
                 Name = assignmentDomain.Name,
                 Description = assignmentDomain.Description,
+                NumberOfParticipants = assignmentDomain.NumberOfParticipants,
                 Status = assignmentDomain.Status,
                 Priority = assignmentDomain.Priority,
             };
@@ -23,6 +24,7 @@ namespace Mappers
             {
                 Name = addAssignmentRequestDto.Name,
                 Description = addAssignmentRequestDto.Description,
+                NumberOfParticipants = addAssignmentRequestDto.NumberOfParticipants,
                 Status = addAssignmentRequestDto.Status,
                 Priority = addAssignmentRequestDto.Priority,
             };
@@ -34,6 +36,7 @@ namespace Mappers
             {
                 Name = updateAssignmentRequestDto.Name,
                 Description = updateAssignmentRequestDto.Description,
+                NumberOfParticipants = updateAssignmentRequestDto.NumberOfParticipants,
                 Status = updateAssignmentRequestDto.Status,
                 Priority = updateAssignmentRequestDto.Priority,
             };

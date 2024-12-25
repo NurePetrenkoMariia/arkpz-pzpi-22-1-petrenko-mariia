@@ -21,7 +21,13 @@ namespace FarmKeeper
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+               .AddJsonOptions(options =>
+               {
+                   options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+
+                   options.JsonSerializerOptions.WriteIndented = true;
+               });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -70,7 +76,6 @@ namespace FarmKeeper
                 options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
-                //options.MapInboundClaims = false; 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = false,
@@ -92,6 +97,7 @@ namespace FarmKeeper
             builder.Services.AddScoped<IUserTaskRepository, SQLUserTaskRepository>();
             builder.Services.AddScoped<ITaskAssignmentService, TaskAssignmentService>();
             builder.Services.AddScoped<SeedDbService>();
+            builder.Services.AddScoped<IFeedMonitoringService, FeedMonitoringService>();
 
             var app = builder.Build();
 

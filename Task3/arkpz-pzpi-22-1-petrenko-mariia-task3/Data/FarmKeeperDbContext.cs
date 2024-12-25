@@ -1,5 +1,5 @@
 ﻿using FarmKeeper.Enums;
-//using FarmKeeper.Migrations;
+using FarmKeeper.Migrations;
 using FarmKeeper.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata.Ecma335;

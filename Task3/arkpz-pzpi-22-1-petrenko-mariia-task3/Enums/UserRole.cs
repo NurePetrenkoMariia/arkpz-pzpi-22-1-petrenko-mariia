@@ -4,6 +4,7 @@
     {
         Owner,
         Admin,
-        Worker
+        Worker,
+        DatabaseAdmin
     }
 }

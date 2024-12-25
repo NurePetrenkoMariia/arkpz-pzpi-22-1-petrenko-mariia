@@ -22,7 +22,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetAll()
         {
             var notificationDomain = await notificationRepository.GetAllAsync();
@@ -32,7 +32,7 @@ namespace FarmKeeper.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var notificationDomain = await notificationRepository.GetByIdAsync(id);
@@ -45,7 +45,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpPost("{userId}")]
-        [Authorize]
+        [Authorize(Roles = "DatabaseAdmin")]
         public async Task<IActionResult> Create([FromRoute] Guid userId, [FromBody] AddNotificationRequestDto addNotificationRequestDto)
         {
             var user = await userRepository.GetByIdAsync(userId);
@@ -65,7 +65,7 @@ namespace FarmKeeper.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "DatabaseAdmin")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateNotificationRequestDto updateNotificationRequestDto)
         {
             var user = await userRepository.GetByIdAsync(updateNotificationRequestDto.UserId);
@@ -85,7 +85,7 @@ namespace FarmKeeper.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "DatabaseAdmin")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var notificationDomain = await notificationRepository.DeleteAsync(id);

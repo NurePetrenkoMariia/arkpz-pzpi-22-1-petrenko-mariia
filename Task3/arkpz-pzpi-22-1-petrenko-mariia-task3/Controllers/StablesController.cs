@@ -21,7 +21,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetAll()
         {
             var stableDomain = await stableRepository.GetAllAsync();
@@ -32,7 +32,7 @@ namespace FarmKeeper.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var stableDomain = await stableRepository.GetByIdAsync(id);
@@ -45,7 +45,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpPost("{farmId}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Create([FromRoute] Guid farmId, [FromBody] AddStableRequestDto addStableRequestDto)
         {
             if (ModelState.IsValid)
@@ -71,7 +71,7 @@ namespace FarmKeeper.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateStableRequestDto updateStableRequestDto)
         {
             if (ModelState.IsValid)
@@ -98,7 +98,7 @@ namespace FarmKeeper.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var stableDomain = await stableRepository.DeleteAsync(id);

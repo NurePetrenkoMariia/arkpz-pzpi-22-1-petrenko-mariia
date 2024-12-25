@@ -69,5 +69,29 @@ namespace FarmKeeper.Controllers
             var token = tokenService.CreateToken(existingUser);
             return Ok(token);
         }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto request)
+        {
+            var existingUser = await userRepository.GetByEmailAsync(request.Email);
+            if (existingUser == null)
+            {
+                return Unauthorized("User not found.");
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, existingUser.PasswordHash))
+            {
+                return Unauthorized("Current password is incorrect.");
+            }
+
+            var newPasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+
+            existingUser.PasswordHash = newPasswordHash;
+
+            await userRepository.UpdateAsync(existingUser.Id, existingUser);
+
+            return Ok("Password changed successfully.");
+        }
+
     }
 }

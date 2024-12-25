@@ -11,7 +11,9 @@ namespace FarmKeeper.Mappers
             {
                 Id = userTaskDomain.Id,
                 UserId = userTaskDomain.UserId,
+                User = userTaskDomain.User,
                 AssignmentId = userTaskDomain.AssignmentId,
+                Assignment = userTaskDomain.Assignment,
             };
         }
 

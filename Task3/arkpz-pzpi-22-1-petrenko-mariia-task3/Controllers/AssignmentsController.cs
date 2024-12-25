@@ -21,7 +21,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetAll()
         {
             var assignmentDomain = await assignmentRepository.GetAllAsync();
@@ -31,7 +31,7 @@ namespace FarmKeeper.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var assignmentDomain = await assignmentRepository.GetByIdAsync(id);
@@ -44,7 +44,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Create([FromBody] AddAssignmentRequestDto addAssignmentRequestDto)
         {
             var assignmentDomain = addAssignmentRequestDto.ToAssignmentFromCreate();
@@ -58,7 +58,7 @@ namespace FarmKeeper.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateAssignmentRequestDto updateAssignmentRequestDto)
         {
             var assignmentDomain = await assignmentRepository.UpdateAsync(id, updateAssignmentRequestDto.ToAssignmentFromUpdate());
@@ -72,7 +72,7 @@ namespace FarmKeeper.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var assignmentDomain = await assignmentRepository.DeleteAsync(id);

@@ -1,7 +1,7 @@
-﻿using Models.DTO;
-using Models;
+﻿using FarmKeeper.Models.DTO;
+using FarmKeeper.Models;
 
-namespace Mappers
+namespace FarmKeeper.Mappers
 {
     public static class StableMapper
     {

@@ -1,9 +1,9 @@
-﻿using Enums;
-using Models;
-using Models.DTO;
+﻿using FarmKeeper.Enums;
+using FarmKeeper.Models;
+using FarmKeeper.Models.DTO;
 using System.Runtime.CompilerServices;
 
-namespace Mappers
+namespace FarmKeeper.Mappers
 {
     public static class AnimalMapper
     {
@@ -33,19 +33,6 @@ namespace Mappers
                 StableId = stableId,
             };
         }
-
-        //public static AnimalDto ToAnimalDtoForCreate(this Animal animalDomain)
-        //{
-        //    return new AnimalDto
-        //    {
-        //        Name = animalDomain.Name,
-        //        Species = animalDomain.Species,
-        //        Breed = animalDomain.Breed,
-        //        DateOfBirth = animalDomain.DateOfBirth,
-        //        Sex = animalDomain.Sex,
-        //        StableId = animalDomain.StableId,
-        //    };
-        //}
 
         public static Animal ToAnimalFromUpdate(this UpdateAnimalRequestDto updateAnimalRequestDto)
         {

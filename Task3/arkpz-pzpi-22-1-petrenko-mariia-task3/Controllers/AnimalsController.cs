@@ -21,7 +21,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetAll()
         {
             var animalDomain = await animalRepository.GetAllAsync();
@@ -32,7 +32,7 @@ namespace FarmKeeper.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var animalDomain = await animalRepository.GetByIdAsync(id);
@@ -45,7 +45,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpPost("{stableId}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Create([FromRoute] Guid stableId, [FromBody] AddAnimalRequestDto addAnimalRequestDto)
         {
             var stable = await stableRepository.GetByIdAsync(stableId);
@@ -65,7 +65,7 @@ namespace FarmKeeper.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateAnimalRequestDto updateAnimalRequestDto)
         {
             var stable = await stableRepository.GetByIdAsync(updateAnimalRequestDto.StableId);
@@ -86,7 +86,7 @@ namespace FarmKeeper.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var animalDomain = await animalRepository.DeleteAsync(id);

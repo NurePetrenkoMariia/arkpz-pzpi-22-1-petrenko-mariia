@@ -26,7 +26,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetAll()
         {
             var userDomain = await userRepository.GetAllAsync();
@@ -36,7 +36,7 @@ namespace FarmKeeper.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var userDomain = await userRepository.GetByIdAsync(id);
@@ -49,10 +49,12 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Create([FromBody] AddUserRequestDto addUserRequestDto)
         {
             var userDomain = addUserRequestDto.ToUserFromCreate();
+
+            userDomain.PasswordHash = BCrypt.Net.BCrypt.HashPassword(addUserRequestDto.PasswordHash);
 
             userDomain = await userRepository.CreateAsync(userDomain);
 
@@ -63,7 +65,7 @@ namespace FarmKeeper.Controllers
 
         [HttpPut]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateUserRequestDto updateUserRequestDto)
         { 
             var userDomain = await userRepository.UpdateAsync(id, updateUserRequestDto.ToUserFromUpdate());
@@ -77,7 +79,7 @@ namespace FarmKeeper.Controllers
 
         [HttpDelete]
         [Route("{id:Guid}")]
-        [Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var userDomain = await userRepository.DeleteAsync(id);
@@ -90,7 +92,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpPost("add-admin/{farmId}")]
-        [Authorize(Roles = "Owner")]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> AddAdminToFarm(Guid farmId, [FromBody] AddAdminRequestDto addAdminRequestDto)
         {
             var farm = await farmRepository.GetByIdAsync(farmId);

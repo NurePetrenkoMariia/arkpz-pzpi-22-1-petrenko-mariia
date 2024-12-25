@@ -1,6 +1,7 @@
 ﻿using FarmKeeper.Models;
 using FarmKeeper.Repositories;
 using FarmKeeper.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,13 +28,13 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpPost("assign-tasks")]
-        //authorize
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> AssignTasks()
         {
             var workers = await userRepository.GetWorkersForAssignmentsAsync();
             var tasks = await assignmentRepository.GetNotStartedAssignmentsAsync();
 
-            var assignedTasks = taskAssignmentService.AssignTasks(workers, tasks);
+            var assignedTasks = await taskAssignmentService.AssignTasks(workers, tasks);
 
             await userTaskRepository.AddUserTasksAsync(assignedTasks);
 

@@ -18,7 +18,7 @@ namespace FarmKeeper.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetAll()
         {
             var userTaskDomain = await userTaskRepository.GetAllAsync();
@@ -28,7 +28,7 @@ namespace FarmKeeper.Controllers
 
         [HttpGet]
         [Route("{id:Guid}")]
-        //[Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             var userTaskDomain = await userTaskRepository.GetByIdAsync(id);
@@ -40,7 +40,7 @@ namespace FarmKeeper.Controllers
             return Ok(userTaskDomain.ToUserTaskDto());
         }
         [HttpPost]
-        //[Authorize]
+        [Authorize(Roles = "Owner,DatabaseAdmin")]
         public async Task<IActionResult> Create([FromBody] AddUserTaskRequestDto addUserTaskRequestDto)
         {
             var userTaskDomain = addUserTaskRequestDto.ToUserTaskFromCreate();
