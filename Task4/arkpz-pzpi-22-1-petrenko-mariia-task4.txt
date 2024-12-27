@@ -1,1 +1,269 @@
+﻿Харківський університет радіоелектроніки
+Факультет комп'ютерних наук
+Кафедра програмної інженерії
 
+
+
+ЗВІТ
+до лабораторної роботи № 4
+з дисципліни
+"Аналіз та рефакторинг коду"
+на тему: "РОЗРОБКА IoT КЛІЄНТА 
+(БІЗНЕС-ЛОГІКИ ТА ФУНКЦІЙ НАЛАШТУВАННЯ)"
+
+
+
+
+Виконала ст. гр ПЗПІ-22-1
+Петренко Марія Олександрівна
+
+    Перевірив
+    ст. викладач кафедри ПІ
+    Сокорчук Ігор Петрович
+
+
+
+
+
+
+
+Харків 2024
+1 МЕТА
+     Розробити програмне забезпечення для  IoT або SmartDevice пристрою, створеного на базі будь-якої поширеної на  сьогодні платформи, придатної для реалізації вбудованих систем (Embedded  System).
+2 ЗАВДАННЯ
+- Розробити будову програмного забезпечення ІоТ клієнта.
+- Створити UML діаграму прецедентів для ІоТ клієнта.
+- Розробити бізнес логіку (математину обробку повʼязаних із предметною областю даних) та функції налаштування ІоТ клієнта.
+- Створити діаграму діяльності для ІоТ клієнта.
+- Створити програмну реалізацію бізнес логіки та функцій налаштування ІоТ клієнта.
+- Перевірити роботу ІоТ клієнта.
+3 ХІД РОБОТИ 
+     Для цієї лабораторної роботи використовувався сервіс Wokwi для розробки логіки ІоТ клієнта. Для забезпечення передачі даних між ІоТ клієнтом та сервером використовувався сервіс Pinggy для створення захищених тунелів. В якості ІоТ клієнта було обрано ESP32 та ультразвуковий датчик HC-SR04. 
+     Першим етапом роботи з ІоТ пристроєм є його налаштування. Фрагмент програмного коду, що використовується для запиту в користувача налаштувань наведений в додатку А.1.
+     На стороні ІоТ клієнта виконується розрахунок кількості корму, який залишився в кормушці, та прогнозованого значення кількості годин, хвилин та секунд до закінчення корму. Програмний код бізнес логіки наведений в додатку А.2.
+     Також була створена UML діаграма прецедентів ІоТ клієнта, що зображена на рисунку 1.
+     
+     
+     Рисунок 1 - UML діаграма прецедентів ІоТ клієнта
+     
+     UML діаграма діяльності ІоТ клієнта наведена на рисунку 2.
+     
+     
+     Рисунок 2 - UML діаграма діяльності ІоТ клієнта
+     
+     
+     
+     
+ВИСНОВКИ
+     В ході цієї лабораторної роботи було розроблено програмне забезпечення для  IoT пристрою включно з бізнес логікою та функціями налаштування клієнту. Відео із захистом роботи завантажено за посиланням: https://youtu.be/R2skdzLIhrE. 
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     ДОДАТОК А
+     А.1. Фрагмент коду для налаштування ІоТ клієнта
+      1 //Функція налаштування
+      2 void configureDevice() {
+      3   Serial.println("Device settings");
+      4 
+      5   Serial.print("Enter WiFi Name: ");
+      6   wifiName = readSerialInput();
+      7   Serial.println(wifiName);
+      8 
+      9   Serial.print("Enter WiFi Password: ");
+      10   wifiPassword = readSerialInput();
+      11   Serial.println("WiFi Password set.");
+      12 
+      13   Serial.print("Enter Server Base URL: ");
+      14   serverBaseUrl = readSerialInput();
+      15   Serial.println(serverBaseUrl);
+      16 
+      17   Serial.print("Enter Stable ID: ");
+      18   stableId = readSerialInput();
+      19   Serial.println(stableId);
+      20 
+      21   Serial.print("Enter feeder height: ");
+      22   feederHeight = readSerialInput().toInt();
+      23   Serial.println(String(feederHeight));
+      24 }
+      25 
+      26 //Функція зчитування вводу користувача
+      27 String readSerialInput() {
+      28   String input = "";
+      29   while (true) {
+      30     while (Serial.available() > 0) {
+      31       char c = Serial.read();
+      32       if (c == '\n') {
+      33         return input;
+      34       } else {
+      35         input += c;
+      36       }
+      37     }
+      38   }
+      39 }
+     
+     А.2. Фрагмент коду бізнес логіки ІоТ клієнта
+      1 //Функція для визначення рівня корму
+      2 float measureFeedLevel() {
+      3   digitalWrite(TRIG_PIN, LOW); //Початок вимірювання з 0 значення
+      4   delayMicroseconds(2);
+      5   digitalWrite(TRIG_PIN, HIGH); //Надсилання імпульсу
+      6   delayMicroseconds(10);
+      7   digitalWrite(TRIG_PIN, LOW); //Завершення вимірювання
+      8 
+      9   long duration = pulseIn(ECHO_PIN, HIGH); //Вимір часу між надсиланням та поверненням імпульсу
+      10   float distance = duration * speedOfSound / 2; //Розрахунок відстані в см
+      11 
+      12   return feederHeight - round(distance);
+      13 }
+      14 
+      15 //Конвертація часу у тип time_t
+      16 time_t parseISO8601(String timestamp) {
+      17   tmElements_t tm;
+      18 
+      19   tm.Year = timestamp.substring(0, 4).toInt() - 1970;
+      20   tm.Month = timestamp.substring(5, 7).toInt();
+      21   tm.Day = timestamp.substring(8, 10).toInt();
+      22   tm.Hour = timestamp.substring(11, 13).toInt();
+      23   tm.Minute = timestamp.substring(14, 16).toInt();
+      24   tm.Second = timestamp.substring(17, 19).toInt();
+      25 
+      26   return makeTime(tm);
+      27 }
+      28 
+      29 //Функція для розрахунку швидкості споживання корму
+      30 float calculateFeedConsumptionSpeed(const JsonArray& feedHistory) {
+      31   float totalConsumption = 0.0;
+      32   long totalTime = 0;
+      33 
+      34   for (size_t i = 1; i < feedHistory.size(); i++) {
+      35     float prevLevel = feedHistory[i - 1]["feedLevel"]; //Попередній рівень корму
+      36     float currLevel = feedHistory[i]["feedLevel"]; //Поточний рівень корму
+      37     time_t prevTime = parseISO8601(feedHistory[i - 1]["timestamp"].as<String>());
+      38     time_t currTime = parseISO8601(feedHistory[i]["timestamp"].as<String>());
+      39     totalConsumption += (prevLevel - currLevel);
+      40     totalTime += (currTime - prevTime);
+      41   }
+      42 
+      43   float speed = totalConsumption / (totalTime / 3600.0); //Обчислення кількості спожитого корму за годину
+      44   Serial.println("Calculated consumption speed: " + String(speed));
+      45   return speed;
+      46 }
+      47 
+      48 //Функція для прогнозування часу закінчення корму
+      49 long predictTimeToEmpty(int currentLevel, float consumptionSpeed) {
+      50   if (consumptionSpeed <= 0) {
+      51     return -1;
+      52   }
+      53   return (currentLevel / consumptionSpeed) * 3600;
+      54 }
+      55 
+      56 //Функція надсилання даних на сервер
+      57 void sendFeedDataToServer(int feedLevel, long timeToEmpty) {
+      58   if (WiFi.status() == WL_CONNECTED) {
+      59     HTTPClient http; //Об'єкт для виконання запитів
+      60     String url = serverBaseUrl + "FeedMonitoring/update-feed-level";
+      61     http.begin(url);
+      62     http.addHeader("Content-Type", "application/json"); //Налаштування формату даних
+      63 
+      64     String payload = "{\"StableId\": \"" + stableId +
+      65                      "\", \"CurrentFeedLevel\": " + String(feedLevel) +
+      66                      (timeToEmpty > 0 ? ", \"PredictedTimeToEmpty\": " + String(timeToEmpty) : "") + "}";
+      67 
+      68     int httpCode = http.POST(payload); //Надсилання на сервер
+      69     if (httpCode > 0) {
+      70       Serial.println("Data sent successfully.");
+      71     } else {
+      72       Serial.println("Error sending data to server.");
+      73     }
+      74     http.end();
+      75   } else {
+      76     Serial.println("WiFi disconnected!");
+      77   }
+      78 }
+      79 
+      80 //Функція отримання даних з сервера
+      81 void fetchFeedHistory() {
+      82   if (WiFi.status() == WL_CONNECTED) {
+      83     HTTPClient http;
+      84     String url = serverBaseUrl + "FeedLevelHistory/get-feed-history/" + stableId;
+      85     http.begin(url);
+      86     int httpCode = http.GET();
+      87 
+      88     //Якщо дані отримані успішно
+      89     if (httpCode == 200) {
+      90       String response = http.getString();
+      91 
+      92       //Десеріалізація y JSON в об'єкт feedHistoryDoc
+      93       DeserializationError error = deserializeJson(feedHistoryDoc, response);
+      94 
+      95       if (error) {
+      96         Serial.println("JSON Deserialization Error: " + String(error.c_str()));
+      97         http.end();
+      98         return;
+      99       }
+      100 
+      101       //Перевірка структури JSON
+      102       if (feedHistoryDoc.is<JsonArray>()) {
+      103         feedHistory = feedHistoryDoc.as<JsonArray>();
+      104         Serial.println("Feed History Size: " + String(feedHistory.size()));
+      105       } else {
+      106         Serial.println("Unexpected JSON structure.");
+      107       }
+      108     } else {
+      109       Serial.println("HTTP Error: " + String(httpCode));
+      110     }
+      111     http.end();
+      112   } else {
+      113     Serial.println("WiFi disconnected!");
+      114   }
+      115 }
+      116 
+      117 void loop() {
+      118   int currentFeedLevel = measureFeedLevel(); //Вимірювання рівня корму
+      119   Serial.println("Measured feed level: " + String(currentFeedLevel));
+      120 
+      121   fetchFeedHistory(); //Отримання даних з сервера
+      122 
+      123   if (feedHistory.size() >= 2) {
+      124     float consumptionSpeed = calculateFeedConsumptionSpeed(feedHistory); //Рохрахунок швидкості споживання
+      125     long timeToEmpty = -1;
+      126 
+      127     if (consumptionSpeed > 0) {
+      128       timeToEmpty = predictTimeToEmpty(currentFeedLevel, consumptionSpeed); //Розрахунок прогнозу
+      129       Serial.println("Predicted time to empty (s): " + String(timeToEmpty));
+      130     } else {
+      131       Serial.println("Not enough data to predict time to empty.");
+      132     }
+      133 
+      134     sendFeedDataToServer(currentFeedLevel, timeToEmpty); //Надсилання на сервер
+      135   } else {
+      136     Serial.println("Not enough records in feed history.");
+      137   }
+      138 
+      139   delay(100000); //Затримка між вимірюваннями
+      140 }
+      2
+      
+      
