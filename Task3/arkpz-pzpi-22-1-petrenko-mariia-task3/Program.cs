@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Net;
 using System.Security.Claims;
 
 namespace FarmKeeper
@@ -28,6 +29,7 @@ namespace FarmKeeper
 
                    options.JsonSerializerOptions.WriteIndented = true;
                });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -99,7 +101,17 @@ namespace FarmKeeper
             builder.Services.AddScoped<SeedDbService>();
             builder.Services.AddScoped<IFeedMonitoringService, FeedMonitoringService>();
 
+            builder.Services.AddCors(corsOptions => {
+                corsOptions.AddPolicy("AllowAll", policy => {
+                    policy.WithHeaders().AllowAnyHeader(); policy.WithHeaders().AllowCredentials();
+                    policy.WithOrigins().AllowAnyMethod()
+                       .AllowAnyHeader();
+                });
+            });
+
             var app = builder.Build();
+
+            app.UseCors("AllowAll");
 
             using (var scope = app.Services.CreateScope())
             {

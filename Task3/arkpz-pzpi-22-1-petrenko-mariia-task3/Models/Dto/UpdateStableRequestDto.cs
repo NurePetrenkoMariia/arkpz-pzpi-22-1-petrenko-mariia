@@ -7,6 +7,7 @@ namespace FarmKeeper.Models.DTO
         [Required]
         [Range(0, int.MaxValue, ErrorMessage = "MinFeedLevel must be a non-negative integer.")]
         public int MinFeedLevel { get; set; }
+
         [Required]
         public Guid FarmId { get; set; }
     }

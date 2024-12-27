@@ -13,7 +13,7 @@ namespace FarmKeeper.Service
         {
             this.dbContext = dbContext;
         }
-
+  
         public async Task<List<UserTask>> AssignTasks(List<User> workers, List<Assignment> assignments)
         {
             var userTasks = new List<UserTask>();
@@ -61,7 +61,6 @@ namespace FarmKeeper.Service
                     workerIndex = 0; 
                 }
             }
-
             return userTasks;
         }
     }

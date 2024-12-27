@@ -39,12 +39,16 @@ namespace FarmKeeper.Controllers
 
             List<Farm> farmDomain;
 
+            if (role == nameof(UserRole.DatabaseAdmin))
+            {
+                farmDomain = await farmRepository.GetAllAsync();
+            }
+
             if (role == "Owner")
             {
                 var ownerId = Guid.Parse(userId);
                 farmDomain = await farmRepository.GetFarmsByOwnerIdAsync(ownerId);
             }
-
             else 
             {
                 farmDomain = await farmRepository.GetAllAsync();

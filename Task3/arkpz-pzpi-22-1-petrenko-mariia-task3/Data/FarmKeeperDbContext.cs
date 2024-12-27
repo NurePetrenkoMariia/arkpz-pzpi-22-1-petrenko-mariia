@@ -18,6 +18,7 @@ namespace FarmKeeper.Data
         public DbSet<Farm> Farms { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Stable> Stables { get; set; }
+        public DbSet<FeedLevelHistory> FeedLevelHistory { get; set; }
         public DbSet<User> Users{ get; set; }
         public DbSet<UserTask> UserTasks { get; set; }
 
@@ -46,6 +47,11 @@ namespace FarmKeeper.Data
                  .WithMany(s => s.Animals)
                  .HasForeignKey(a => a.StableId)
                  .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FeedLevelHistory>()
+                .HasOne(flh => flh.Stable)
+                .WithMany(s => s.FeedLevelHistory)
+                .HasForeignKey(flh => flh.StableId);
 
             base.OnModelCreating(modelBuilder);
         }

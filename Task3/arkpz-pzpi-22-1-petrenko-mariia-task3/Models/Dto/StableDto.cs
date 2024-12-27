@@ -4,9 +4,8 @@
     {
         public Guid Id { get; set; }
         public int MinFeedLevel { get; set; }
-        public int CurrentFeedLevel { get; set; }
-        public DateTime DateTimeOfUpdate { get; set; }
         public Guid FarmId { get; set; }
         public List<AnimalDto> Animals { get; set; }
+        public List<FeedLevelHistory> FeedLevelHistory { get; set; }
     }
 }

@@ -10,6 +10,5 @@ namespace FarmKeeper.Models
         public int NumberOfParticipants { get; set; }
         public Status Status { get; set; }
         public Priority Priority { get; set; }
-
     }
 }

@@ -56,8 +56,6 @@ namespace FarmKeeper.Repositories
             }
 
             existingStable.MinFeedLevel = stable.MinFeedLevel;
-            existingStable.CurrentFeedLevel = stable.CurrentFeedLevel;
-            existingStable.DateTimeOfUpdate = stable.DateTimeOfUpdate;
             existingStable.FarmId = stable.FarmId;
 
             await dbContext.SaveChangesAsync();

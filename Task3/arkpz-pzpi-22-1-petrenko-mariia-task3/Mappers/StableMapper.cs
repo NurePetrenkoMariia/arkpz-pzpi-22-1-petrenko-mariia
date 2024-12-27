@@ -11,10 +11,9 @@ namespace FarmKeeper.Mappers
             {
                 Id = stableDomain.Id,
                 MinFeedLevel = stableDomain.MinFeedLevel,
-                CurrentFeedLevel = stableDomain.CurrentFeedLevel,
-                DateTimeOfUpdate = stableDomain.DateTimeOfUpdate,
                 FarmId = stableDomain.FarmId,
-                Animals = stableDomain.Animals?.Select(a => a.ToAnimalDto()).ToList()
+                Animals = stableDomain.Animals?.Select(a => a.ToAnimalDto()).ToList(),
+                FeedLevelHistory = stableDomain.FeedLevelHistory?.ToList()
             };
         }
 
