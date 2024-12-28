@@ -66,8 +66,12 @@ namespace FarmKeeper.Controllers
                 return BadRequest("Error! File was not found or empty.");
             }
 
-
-            string filePath = @"C:\Users\Мария\Downloads\FarmKeeperDatabaseBackup.bak";
+            string downloadPath = Path.Combine(
+               Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+               "Downloads"
+            );
+           
+            string filePath = Path.Combine(downloadPath, "FarmKeeperDatabaseBackup.bak");
 
             try
             {
