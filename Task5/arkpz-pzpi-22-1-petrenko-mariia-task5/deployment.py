@@ -5,7 +5,7 @@ import getpass
 import os
 import json
 
-#Функція для встановлення Chocolatey
+#Р¤СѓРЅРєС†С–СЏ РґР»СЏ РІСЃС‚Р°РЅРѕРІР»РµРЅРЅСЏ Chocolatey
 def install_chocolatey():
     print("Starting setup of the Chocolatey package manager.")
     installation_string = (
@@ -19,7 +19,7 @@ def install_chocolatey():
     except subprocess.CalledProcessError as e:
         print("Error installing the Chocolatey package manager.")
 
-#Функція для встановлення .NET 8.0
+#Р¤СѓРЅРєС†С–СЏ РґР»СЏ РІСЃС‚Р°РЅРѕРІР»РµРЅРЅСЏ .NET 8.0
 def install_dotnet():
     print("You don't have .NET installed.")
     print("Starting installation.")
@@ -29,7 +29,7 @@ def install_dotnet():
     except subprocess.CalledProcessError as e:
        print("Error installing .NET 8.")
 
-#Функція для встановлення SQL Server
+#Р¤СѓРЅРєС†С–СЏ РґР»СЏ РІСЃС‚Р°РЅРѕРІР»РµРЅРЅСЏ SQL Server
 def install_sql_server():
     print("You don't have MS SQL Server installed.")
     print("Starting installation.")
@@ -39,7 +39,7 @@ def install_sql_server():
     except subprocess.CalledProcessError as e:
         print("Error installing SQL Server")
 
-#Функція для налаштування бази даних
+#Р¤СѓРЅРєС†С–СЏ РґР»СЏ РЅР°Р»Р°С€С‚СѓРІР°РЅРЅСЏ Р±Р°Р·Рё РґР°РЅРёС…
 def db_setup(server, username, password, db_name):
     print("Looking for backup file")
     backup_path = os.path.abspath(os.path.join("Migrations", "FarmKeeperDatabaseBackup.bak"))
@@ -83,7 +83,7 @@ def db_setup(server, username, password, db_name):
         else:
             print("Error restoring the data base from the backup file.")
 
-#Функція для зміни рядка підключення
+#Р¤СѓРЅРєС†С–СЏ РґР»СЏ Р·РјС–РЅРё СЂСЏРґРєР° РїС–РґРєР»СЋС‡РµРЅРЅСЏ
 def change_connect_string(server, username, password, db_name):
     current_directory = os.getcwd()
     appsettings_path = os.path.join(current_directory, 'appsettings.json')
@@ -109,21 +109,21 @@ def change_connect_string(server, username, password, db_name):
 
 def main():
     print("Starting setup of the program")
-    #Перевірка чи встановлений менеджер пакетів Chocolatey на пристрої
+    #РџРµСЂРµРІС–СЂРєР° С‡Рё РІСЃС‚Р°РЅРѕРІР»РµРЅРёР№ РјРµРЅРµРґР¶РµСЂ РїР°РєРµС‚С–РІ Chocolatey РЅР° РїСЂРёСЃС‚СЂРѕС—
     try:
         subprocess.run(["choco", "-v"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         print("The Chocolatey package manager was found.")
     except FileNotFoundError:
         install_chocolatey()
 
-    #Перевірка чи встановлений .NET
+    #РџРµСЂРµРІС–СЂРєР° С‡Рё РІСЃС‚Р°РЅРѕРІР»РµРЅРёР№ .NET
     try:
         subprocess.run(["dotnet", "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         print(".NET was found.")
     except FileNotFoundError:
         install_dotnet()
 
-    #Перевірка чи встановлений MS SQL Server 
+    #РџРµСЂРµРІС–СЂРєР° С‡Рё РІСЃС‚Р°РЅРѕРІР»РµРЅРёР№ MS SQL Server
     try:
         subprocess.run(["sqlcmd", "-?"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         print("SQL Server was found.")
@@ -135,10 +135,10 @@ def main():
     password = getpass.getpass("Enter password: ")
     db_name = "FarmDb"
 
-    #Налаштування бази даних
+    #РќР°Р»Р°С€С‚СѓРІР°РЅРЅСЏ Р±Р°Р·Рё РґР°РЅРёС…
     db_setup(server, username, password, db_name)
 
-    #Налаштування appsettings.json
+    #РќР°Р»Р°С€С‚СѓРІР°РЅРЅСЏ appsettings.json
     change_connect_string(server, username, password, db_name)
 
 if __name__ == "__main__":
